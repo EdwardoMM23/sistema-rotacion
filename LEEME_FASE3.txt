@@ -1,0 +1,71 @@
+FASE 3 — ROTACIONES, HISTORIAL Y CUENTAS MÁS SENCILLAS
+======================================================
+
+QUÉ INCLUYE
+-----------
+1. Inicio de sesión más claro: solicita nombre de usuario y contraseña.
+2. Rol único "Enfermería": las cuentas antiguas con rol "Doctor" se convierten a "Enfermeria" al inicializar la aplicación. Ambos tienen los mismos permisos.
+3. Pantalla "Cuentas de usuario": el administrador crea cuentas y activa/desactiva cuentas desde la interfaz, sin tener que usar la terminal para cada persona.
+4. En la tabla de rotaciones aparece el detalle de asignaciones con un acceso para solicitar un cambio de estación.
+5. El cambio manual pide un motivo y revisa autorización, restricciones activas y reglas de estaciones consecutivas.
+6. Historial de generación y cambios manuales, con fecha/hora, usuario y motivo.
+7. El generador guarda quién creó cada rotación.
+
+ANTES DE INSTALAR
+-----------------
+1. Detén Flask con Ctrl+C.
+2. Copia toda tu carpeta actual como respaldo.
+3. Haz otra copia de instance/rotacion.db y guárdala fuera del proyecto.
+4. No incluyas ni reemplaces la carpeta venv. Este ZIP solo contiene archivos para combinar con tu proyecto.
+5. No ejecutes cargar_pruebas.py ni crear_tablas.py.
+
+INSTALACIÓN
+-----------
+1. Descomprime el ZIP.
+2. Abre la carpeta sistema_rotacion_fase3 en el explorador de archivos.
+3. Copia su contenido sobre la carpeta raíz de tu proyecto actual, conservando las carpetas templates.
+4. Acepta reemplazar SOLO los archivos incluidos en el ZIP. No reemplaces instance/rotacion.db.
+5. Activa tu entorno virtual si no está activo y ejecuta:
+       python app.py
+6. Al arrancar, crear_base_datos() hace una migración pequeña: convierte los roles antiguos "Doctor" a "Enfermeria". No elimina usuarios ni sus contraseñas.
+7. Inicia sesión con una cuenta Administrador. En el menú aparecerá "Cuentas de usuario".
+8. Crea una cuenta de prueba para cada función: Líder de producción, Supervisor y Enfermería.
+9. Cierra sesión y prueba cada cuenta por separado.
+
+CÓMO CREAR CUENTAS
+------------------
+En "Cuentas de usuario":
+- Nombre de usuario: lo que la persona escribirá al entrar, por ejemplo lider.turnoA.
+- Nombre completo: el nombre que aparecerá dentro del sistema.
+- Función: selecciona Líder, Supervisor, Enfermería o Administrador.
+- Contraseña: mínimo 10 caracteres y confirmación idéntica.
+
+Cada persona debe tener su propia cuenta. No compartan contraseñas. Para evitar bloquearse fuera del sistema, conserva al menos una cuenta de Administrador activa. No desactives tu propia cuenta desde la pantalla.
+
+PRUEBAS RECOMENDADAS
+--------------------
+[ ] La cuenta Administrador ve "Cuentas de usuario".
+[ ] Líder, Supervisor y Enfermería no ven "Cuentas de usuario".
+[ ] Una cuenta con rol antiguo Doctor inicia sesión y aparece como Enfermería.
+[ ] Una cuenta inactiva no puede iniciar sesión.
+[ ] La tabla de rotaciones carga las asignaciones guardadas.
+[ ] Cambiar a una estación sin autorización debe rechazarse.
+[ ] Cambiar a una estación bloqueada por una restricción vigente debe rechazarse.
+[ ] La combinación Horno -> Pulido debe rechazarse si son periodos consecutivos.
+[ ] Cambiar de estación requiere un motivo.
+[ ] Un cambio exitoso aparece en "Historial".
+[ ] Imprimir la tabla sigue funcionando.
+[ ] Los registros previos siguen presentes después de instalar.
+
+LIMITACIONES IMPORTANTES
+-----------------------
+- La edición valida autorización, restricciones registradas y las reglas de secuencia/postura que existen en algoritmo.py. No reemplaza la revisión del líder ni la autorización de la empresa.
+- La validación de cambios manuales todavía no calcula automáticamente la cobertura requerida de cada estación, ni valida todos los cambios en cascada sobre toda la jornada.
+- El aislamiento por línea para cada usuario todavía no está aplicado de extremo a extremo.
+- No hay todavía una función de restablecer contraseña desde la interfaz.
+- La vista de historial consulta registros de la fecha elegida; las generaciones anteriores a esta fase no tendrán necesariamente un evento de historial retroactivo.
+- Este sistema sigue siendo un prototipo. Usa datos ficticios hasta que la empresa autorice una prueba formal. No ingreses diagnósticos u otros datos médicos reales en un entorno de prueba.
+
+SI ALGO FALLA
+--------------
+No borres la base de datos. Copia el mensaje completo de error de la terminal y dime en qué pantalla ocurrió. Si el problema aparece justo después de instalar, restaura la copia de seguridad y comparte el error para corregirlo.

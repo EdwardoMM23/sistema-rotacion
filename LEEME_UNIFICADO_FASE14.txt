@@ -1,0 +1,9 @@
+PAQUETE UNIFICADO PARA PRUEBAS — FASE 14
+
+1. Esta carpeta reemplaza la necesidad de combinar manualmente varios parches sobre una misma carpeta, pero no debe reemplazar tu proyecto original sin respaldo.
+2. No se incluyó instance/rotacion.db, ni .venv/venv, para evitar mezclar datos y dependencias de otro equipo. La aplicación creará la base al ejecutar crear_tablas.py o run_server.py.
+3. Requisitos: Python 3.11 o 3.12 recomendado. Instala con: python -m pip install -r requirements.txt
+4. Configura una SECRET_KEY privada antes de usar run_server.py. No compartas esa clave.
+5. Guía de alcance y pendientes: REVISION_FASES_Y_PENDIENTES.txt
+6. Guías anteriores: consulta GUIA_UNIFICADA_PANTALLA_COMPARTIDA_Y_DESPLIEGUE.txt y LEEME_INSTALACION_Y_PRUEBAS.txt.
+7. Esta entrega no debe usarse con datos reales hasta que la empresa autorice los permisos médicos, TI revise despliegue y se completen las pruebas funcionales.

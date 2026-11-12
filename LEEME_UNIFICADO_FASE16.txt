@@ -1,0 +1,15 @@
+SISTEMA DE ROTACIONES — ENTREGA FASE 16
+
+Base: sistema_rotacion1OR 2nov.zip proporcionado por el usuario.
+Paquete completo de código actualizado; no incluye entornos virtuales ni bases de datos operativas.
+
+Antes de iniciar:
+1. Respalda la carpeta instance de tu proyecto anterior.
+2. Extrae este paquete en una carpeta nueva.
+3. Copia tu base de datos respaldada a instance/rotacion.db.
+4. Sigue GUIA_FASE16.txt.
+5. Ejecuta python verificar_fase16.py para comprobar migraciones.
+
+Documentos: CAMBIOS_FASE16.txt, GUIA_FASE16.txt, PRUEBAS_FASE16.txt y verificar_fase16.py.
+No sustituyas tu respaldo original ni introduzcas información clínica real en pruebas.
+La sustitución/reincorporación automatizada por emergencia y la vista consolidada de todo el grupo siguen pendientes, tal como se especifica en CAMBIOS_FASE16.txt.

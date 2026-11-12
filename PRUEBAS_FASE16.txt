@@ -1,0 +1,43 @@
+LISTA DE PRUEBAS — FASE 16
+
+A. Migración
+[ ] Hacer respaldo de instance/rotacion.db.
+[ ] Ejecutar el sistema y confirmar que no se pierden operadores, líneas, asistencia ni rotaciones.
+[ ] Confirmar que existe seguimiento_capacitacion y columna operadores.area.
+[ ] Confirmar que aparecen MFI1, MFI2, MFI3 y MFI4.
+
+B. Certificación
+[ ] Buscar operador por número parcial.
+[ ] Buscar operador por nombre.
+[ ] Registrar Pulido como En entrenamiento y verificar que no se autoriza.
+[ ] Programar evaluación para hoy y verificar aviso en Inicio.
+[ ] Registrar Autorizado y verificar autorización activa.
+[ ] Registrar No aprobado y verificar que permanece bloqueado.
+
+C. Producción por parejas
+[ ] Configurar demanda de línea 1 y 2.
+[ ] Capturar asistencia del personal de ambas líneas.
+[ ] Generar grupo desde cualquiera de las dos líneas.
+[ ] Confirmar que cada línea conserva su tabla individual.
+[ ] Confirmar que un operador no aparece en dos líneas durante el mismo intervalo.
+[ ] Repetir para parejas 3–4, 5–6, 7–8 y 9–10 cuando estén dadas de alta.
+[ ] Provocar una línea sin operadores autorizados y confirmar que se revierte todo el grupo.
+
+D. MFI
+[ ] Registrar un operador seleccionando solo el área MFI.
+[ ] Seleccionar MFI2 en Asistencia y comprobar que se muestra el personal MFI del turno.
+[ ] Configurar MFI1–MFI4 con estaciones distintas y demanda variable.
+[ ] Dejar en cero estaciones no utilizadas.
+[ ] Generar grupo MFI y comprobar que no hay asignaciones duplicadas en periodos coincidentes.
+[ ] Probar un periodo sin demanda y verificar que se conserva su horario.
+
+E. Tabla / tableta
+[ ] Confirmar orden de estaciones en la tabla.
+[ ] Abrir pantalla compartida y confirmar orden de tarjetas.
+[ ] Probar vista horizontal, impresión y Guardar como PDF.
+[ ] Probar botones táctiles de habilidades.
+
+F. Emergencias
+[ ] No usar datos reales para esta prueba.
+[ ] Probar manualmente un movimiento/intercambio con motivo.
+[ ] Registrar la limitación: la sustitución y reincorporación automatizadas aún no están incluidas.

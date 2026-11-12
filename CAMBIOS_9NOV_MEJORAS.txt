@@ -1,0 +1,40 @@
+MEJORAS APLICADAS - VERSION 9 DE NOVIEMBRE
+
+1) BUSCADOR EN PRESTAMOS DE OPERADORES
+- Se agregó un campo de búsqueda por número de empleado o nombre.
+- Cada opción muestra número, nombre y línea de origen para evitar confusiones.
+
+2) OPERADORES DISPONIBLES EN CAMBIOS SIMULTANEOS
+- La pantalla de intercambio ahora permite elegir una asignación y sustituirla por un operador disponible/sobrante.
+- El sistema muestra operadores con asistencia Presente que pertenecen al grupo de líneas permitido o que tienen un préstamo aprobado y vigente hacia la línea.
+- No ofrece a una persona que tenga una asignación simultánea en otra línea/periodo ni a quien tenga un préstamo vigente hacia una tercera línea.
+- Antes de sustituir, valida autorización de estación, restricción médica, repetición de estación y continuidad ergonómica.
+- El operador sustituido queda sin esa asignación y puede volver a aparecer como disponible si su préstamo no lo mantiene comprometido con otra línea.
+- Si un operador prestado ya está asignado en la línea receptora, aparece entre las asignaciones y puede participar en el intercambio simultáneo normal.
+- Los cambios se registran en historial. Un préstamo no se devuelve automáticamente por quitar una asignación; la devolución sigue siendo una acción explícita en Préstamos.
+
+3) CATALOGO DE ESTACIONES SEPARADO POR AREA
+PRODUCCION:
+Pegamento, Accesorios, Anel, Decapado, Crimpeo, Horno, Pulido, Int/Visual, IL/RL, Brady y Amarre.
+
+MFI:
+Pegamento, Breakout 1, Breakout 2, Inserción 1, Inserción 2, Crimpeo, Horno, Pulido, Int/Visual, Test A, Empaque 1 y Empaque 2.
+
+- Se agregó una relación estación-área con postura específica por área.
+- Configuración de puestos muestra únicamente las estaciones del área actual.
+- Si se cambia el área de una línea, primero se guarda el área y se recarga la página; después se capturan las cantidades del catálogo nuevo.
+- El generador filtra las estaciones por el área de la línea. No toma estaciones MFI para Producción ni estaciones exclusivas de Producción para MFI.
+- La edición manual de una asignación también limita las estaciones al área de su línea.
+- Horno se considera sentado en MFI y postura variable en Producción.
+- Se normalizaron nombres históricos Visual -> Int/Visual, IL -> IL/RL e IL/Test A -> Test A. Se conserva el historial relacional migrando las referencias de estación a los identificadores canónicos.
+
+4) MIGRACION Y RESPALDO
+- La migración se ejecuta al iniciar el servidor mediante crear_base_datos().
+- Antes del primer arranque de esta versión, detén el sistema y haz una copia de instance/rotacion.db.
+- El ZIP de código no incluye bases de datos ni el entorno virtual; no reemplaces ni borres tu base de datos actual.
+- La migración no borra operadores, rotaciones ni préstamos.
+
+5) LIMITACIONES / PRUEBAS
+- Se verificó sintaxis de los archivos Python, análisis de plantillas Jinja y migración de catálogo sobre una copia de la base de datos.
+- Se verificó que el catálogo devuelva 11 estaciones de Producción y 12 de MFI y que la migración pueda ejecutarse más de una vez.
+- No se realizó prueba visual en navegador/tableta ni prueba física de impresora en este entorno. Realiza pruebas con datos autorizados antes del uso operativo.

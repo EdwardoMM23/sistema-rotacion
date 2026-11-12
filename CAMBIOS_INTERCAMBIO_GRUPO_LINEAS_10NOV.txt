@@ -1,0 +1,30 @@
+CAMBIOS: INTERCAMBIO ENTRE LINEAS DEL MISMO GRUPO
+Fecha: 10 de noviembre de 2026
+
+OBJETIVO
+Permitir que dos operadores asignados en líneas que pertenecen al mismo grupo intercambien sus estaciones durante el mismo periodo, sin registrar un préstamo entre líneas.
+
+COMPORTAMIENTO
+- Al cargar un periodo de una línea, la pantalla muestra también las asignaciones de las demás líneas de su grupo.
+- La búsqueda permite localizar a cualquiera de los operadores por número o nombre; el nombre de la línea aparece junto a cada persona.
+- El intercambio puede realizarse entre dos operadores asignados en líneas distintas del mismo grupo.
+- Cada operador conserva su línea de origen. Solo se intercambian las estaciones de las dos asignaciones.
+- No se crea ni modifica un registro de préstamo por este intercambio.
+- El cambio se registra en el historial de ambas rotaciones y ambas quedan marcadas como modificadas.
+- Se mantiene la alternativa de usar un operador disponible/sobrante.
+- Se conservan validaciones de autorización, restricciones médicas, repetición de estación y secuencias ergonómicas.
+- La coincidencia del periodo se determina por fecha, turno y hora de inicio; no por el número interno de rotación, ya que este puede ser distinto entre líneas que trabajan al mismo tiempo.
+
+EJEMPLO
+Si Eduardo está en Anel de Línea 1 y Mayrel está en Amarre de Línea 2, y ambas líneas pertenecen al mismo grupo y están en el mismo periodo, se pueden intercambiar sus estaciones. Eduardo permanece adscrito a Línea 1 y Mayrel a Línea 2. No se registra préstamo.
+
+ACTUALIZACION
+1. Detener el servidor.
+2. Respaldar instance/rotacion.db.
+3. Reemplazar app.py y templates/intercambio.html por los de esta versión, o usar el ZIP completo.
+4. Conservar la base de datos y el entorno virtual existentes.
+5. Reiniciar el servidor y probar con dos operadores de prueba de líneas del mismo grupo.
+
+ALCANCE DE LAS PRUEBAS
+Se verificó sintaxis de Python y plantillas Jinja. Se ejecutó una consulta con una base de datos de prueba que devolvió asignaciones de ambas líneas para el mismo horario, aunque sus números internos de rotación eran diferentes. También se simuló un intercambio entre dos asignaciones de líneas 1 y 2: las estaciones se intercambiaron, los operadores conservaron su línea, se generó historial en ambas rotaciones y el número de préstamos permaneció sin cambios.
+La prueba visual completa con Flask/navegador debe realizarse en el equipo donde se ejecuta el sistema.

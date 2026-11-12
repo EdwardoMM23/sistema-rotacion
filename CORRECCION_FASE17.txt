@@ -1,0 +1,29 @@
+FASE 17 — CORRECCIONES DE HABILIDADES, DEMANDA MFI Y GENERACIÓN GRUPAL
+
+1) HABILIDADES
+Se reemplazaron los radios ocultos anidados en etiquetas por controles Bootstrap btn-check con etiquetas asociadas mediante id/for. El control es seleccionable con mouse, teclado y pantalla táctil. El nivel elegido queda resaltado y se envía en el formulario al pulsar Guardar habilidades.
+
+2) ERROR DE MFI
+La consulta de estaciones ya no descarta las estaciones cuya cantidad base es 0. Esto permite que una estación se incluya cuando la demanda específica del periodo es mayor que 0. Antes, la consulta filtraba p.cantidad_requerida>0 y podía ignorar una estación aunque la demanda por periodo la solicitara.
+Si la demanda total de todos los periodos de una línea MFI es 0, el sistema ya no guarda una rotación vacía como si hubiera generado correctamente: muestra instrucciones para configurar Puestos por línea. Demanda 0 en una estación o periodo individual sigue siendo válida.
+
+3) GENERACIÓN GRUPAL
+El formulario muestra las líneas sugeridas para el grupo. Producción conserva la pareja de líneas definida; MFI permite seleccionar las líneas MFI del conjunto. El servidor valida que ninguna línea enviada quede fuera del grupo permitido. Solo se regeneran las líneas seleccionadas.
+
+4) IMPRESIÓN
+Se agregó selección entre imprimir solo la tabla o imprimir tabla y detalle de asignaciones.
+
+INSTALACIÓN
+Extrae este parche sobre una COPIA de la carpeta del proyecto 3NOV, conservando la estructura de carpetas y aceptando reemplazar los archivos indicados. No reemplaces instance/rotacion.db.
+
+PRUEBAS RECOMENDADAS
+- En Habilidades, elige un operador, marca Baja/Media/Alta en varias estaciones y guarda. Vuelve a abrir al operador y confirma que se conserva el nivel.
+- En Puestos por línea, abre MFI1. Configura demanda >0 para estaciones elegidas en periodo 1 y/o 2. Deja en 0 las que no se usan. Guarda y genera.
+- Prueba una estación cuya cantidad base sea 0 pero cuya demanda de periodo sea 1: ahora debe ser considerada.
+- Si toda la demanda de MFI1 es 0, debe aparecer un aviso y no una rotación vacía.
+- En Producción, selecciona una línea de la pareja 1–2 y verifica que el formulario no incluya líneas 3–10.
+- En MFI, desmarca una línea que no se desea regenerar y confirma que las demás líneas no se alteren.
+- Imprime en modo Solo tabla y luego en modo Tabla y detalles.
+
+LIMITACIONES
+La consulta posterior a la generación grupal sigue mostrando la línea seleccionada; las otras líneas se consultan cambiando el selector de línea. La consolidación visual de todas las tablas grupales en una sola página no forma parte de este parche. No se ha ejecutado prueba integral de navegador en este entorno.

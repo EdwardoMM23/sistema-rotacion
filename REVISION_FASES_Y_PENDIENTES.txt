@@ -1,0 +1,68 @@
+SISTEMA DE ROTACIONES — REVISIÓN UNIFICADA DE FASES 11, 12 Y 13
+Fecha de revisión: 28 de octubre de 2026
+
+IMPORTANTE
+Esta carpeta es una base unificada de código para pruebas. No es una certificación de que todas las reglas de la planta estén validadas ni una instalación autorizada. Se conservaron los módulos y plantillas del ZIP recibido, se excluyeron bases de datos y entornos virtuales personales y se aplicaron tres correcciones puntuales indicadas abajo.
+
+CONTENIDO IDENTIFICADO EN EL ZIP RECIBIDO
+- Login, roles y aprobación de cuentas.
+- Asistencia por fecha/turno.
+- Catálogo de operadores, estaciones, autorizaciones y estados laborales.
+- Restricciones médicas, registro, seguimiento, alertas, eventos e historial.
+- Configuración de puestos y demanda por periodo.
+- Generación de rotaciones para Producción y MFI.
+- Habilidades Baja/Media/Alta usadas como preferencia.
+- Solicitudes/aprobación/devolución de préstamos con franja horaria.
+- Edición individual, intercambio simultáneo, historial de cambios y versiones.
+- Pantalla compartida de solo lectura e impresión/Guardar como PDF desde el navegador.
+- run_server.py para Waitress; se requiere configurar SECRET_KEY y dependencias en el servidor autorizado.
+
+CORRECCIONES APLICADAS EN ESTA UNIFICACIÓN
+1. Eliminada la declaración duplicada de la misma ruta de edición individual en app.py.
+2. Corregido un nombre de campo en la plantilla de rotaciones: la tabla ahora guarda el nombre de estación en el dato de estación de la fila, no el nombre de línea inexistente en esa consulta.
+3. Añadida la recarga automática cada 60 segundos a la pantalla compartida cuando se activa la opción “Actualizar cada minuto”. La actualización no es instantánea; el navegador debe conservar sesión y conectividad.
+
+PUNTOS QUE REQUIEREN PRUEBA FUNCIONAL EN WINDOWS CON FLASK
+- Acceder a cada ruta según rol; comprobar que un líder no pueda entrar a datos clínicos no autorizados.
+- Generar una propuesta válida, regenerar varias veces y verificar que la propuesta anterior quede cancelada y conservada.
+- Si la generación falla, comprobar que la versión vigente no se cancele.
+- Confirmar que las restricciones activas continúan bloqueando estaciones aunque se archive el reporte.
+- Probar alertas: vencida, vence en siete días y revaloración por más de treinta días sin revisión.
+- Probar extensión, revaloración, finalización y el historial de eventos.
+- Probar préstamos por turno completo, por horario, devolución anticipada y operador prestado entre líneas.
+- Probar la edición y el intercambio con autorizaciones, restricciones médicas y secuencias ergonómicas prohibidas.
+- Verificar que una persona no quede asignada simultáneamente a dos líneas cuando se regeneran líneas por separado o se editan asignaciones manualmente.
+- Verificar configuración de demanda MFI por cada una de las cuatro líneas, ambos periodos, demanda cero y excedente como apoyo.
+- Probar pantalla compartida en un navegador separado, actualización automática y Guardar como PDF.
+- Probar desde tableta en la red autorizada de la empresa.
+
+PENDIENTES / LÍMITES QUE NO DEBEN DARSE POR TERMINADOS
+1. El historial de versiones actual está organizado por registros de rotación/periodo; no existe una entidad única de “propuesta completa” que agrupe todos los periodos de una generación. La pantalla puede no corresponder a la interpretación de versión completa que necesita supervisión.
+2. No se encontró un control en pantalla para activar/desactivar el peso de habilidades; el generador aplica una preferencia fija (Alta favorecida, Baja penalizada). Si se requiere decidir estrategia desde la interfaz, falta implementarlo.
+3. La demanda MFI se configura desde “Configurar puestos” y se identifica por el área de la línea; no hay un selector de área independiente en el formulario de generación. Debe verificarse que esto coincida con el flujo solicitado por el gerente.
+4. Los nombres de catálogo MFI deben confirmarse con el líder. El catálogo usa nombres compartidos con Producción y alias de estación; no se debe asumir que “Visual”, “Int./Visual”, “IL” y “Test A” son intercambiables sin confirmación del proceso.
+5. La generación por línea no demuestra por sí sola que no haya doble asignación entre propuestas ya generadas en distintas líneas. Se requiere una prueba cruzada y posiblemente una validación global transaccional antes de uso operativo.
+6. El detalle clínico está accesible a Supervisor en la ruta de reporte, mientras que el seguimiento médico está limitado a Enfermería/Administrador. Esto requiere aprobación explícita de la empresa y revisión de privacidad antes de usar datos reales. La vista operativa de restricciones no debe incluir diagnóstico ni notas clínicas.
+7. No se puede garantizar un ejecutable Windows ni servicio automático instalado. run_server.py requiere dependencias, clave secreta, equipo host autorizado, configuración de red y pruebas por TI.
+8. No se realizó prueba integral de navegador desde este entorno porque Flask no está instalado en el Python de preparación. La sintaxis de los archivos Python sí se verificó; la integración web debe probarse en el entorno del proyecto.
+
+REGLAS ERGONÓMICAS PRESENTES EN algoritmo.py
+- Horno → Pulido no permitido.
+- IL/Test → Visual no permitido en periodos consecutivos.
+- Visual → IL/Test no permitido en periodos consecutivos.
+- Dos estaciones de pie consecutivas no permitidas.
+
+GUÍA RÁPIDA DE PRUEBAS
+1. Extraer esta carpeta en una ubicación nueva, sin reemplazar el proyecto anterior.
+2. Abrir terminal dentro de la carpeta y crear un entorno: python -m venv .venv
+3. Activar: .venv\Scripts\activate
+4. Instalar: python -m pip install -r requirements.txt
+5. Configurar SECRET_KEY como variable de entorno privada antes de usar run_server.py.
+6. Crear/resolver el esquema: python crear_tablas.py
+7. Inicializar el esquema con `python crear_tablas.py` (este script usa database.py y no elimina datos). Crear una cuenta de prueba con el método documentado en GUIA_LOGIN_SELECCION_ROL.txt o el método aprobado del proyecto.
+8. Ejecutar python app.py solo para desarrollo local. Para probar Waitress, ejecutar python run_server.py después de configurar SECRET_KEY.
+9. Entrar a http://127.0.0.1:8080, usar datos ficticios y seguir la lista de pruebas de este documento.
+10. No copiar una base de datos real a la carpeta de pruebas sin una copia de respaldo y autorización.
+
+ARQUITECTURA PARA TABLETAS
+Python y VS Code no se instalan en las tabletas. La aplicación debe correr en un servidor/PC autorizado; los dispositivos acceden desde navegador por la red interna. El host debe permanecer encendido y TI debe revisar seguridad, respaldos, permisos, firewall y, si aplica, HTTPS.

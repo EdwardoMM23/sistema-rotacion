@@ -1,0 +1,35 @@
+FASE 16 — ACTUALIZACIÓN OPERATIVA Y ROTACIONES POR GRUPO
+
+CAMBIOS INCLUIDOS
+- Inicio: elimina el texto de prototipo y la tarjeta gris «Próximamente» de Restricciones Laborales; el módulo se presenta como disponible.
+- Nuevo módulo de Capacitación y certificaciones por operador/estación.
+- Estados: Pendiente, En entrenamiento, Evaluación programada, Autorizado y No aprobado.
+- Al registrar Autorizado se activa la autorización de esa estación. Los estados no certificados mantienen el puesto bloqueado.
+- Avisos al entrar a Inicio cuando llega o vence la fecha de evaluación. Los avisos operativos no muestran diagnósticos médicos.
+- Búsqueda por número o nombre en Autorizaciones y Habilidades.
+- Habilidades con tarjetas táctiles para tabletas.
+- Líderes pueden entrar a Puestos por línea y ajustar dotación/demanda; la administración de certificaciones y autorizaciones sigue bajo Administrador/Supervisor.
+- Registro de operador: Producción requiere línea; MFI se registra como área y la selección de MFI1–MFI4 se hace en el flujo de rotaciones. Internamente la base conserva una línea técnica inicial MFI1 para compatibilidad, pero el operador se lista como MFI.
+- Asistencia MFI muestra y registra a todo el personal del área, sin importar cuál de las cuatro líneas se seleccione.
+- Generación compartida: Producción procesa el par consecutivo de líneas; MFI procesa MFI1–MFI4. La selección de personal usa el pool de todo el grupo y la operación se guarda en una sola transacción. Si una línea falla, se revierte el grupo entero.
+- Tabla de rotación reorganizada por estaciones, no por filas de operadores, siguiendo el orden del catálogo de cada área. La pantalla compartida ordena sus tarjetas por el mismo orden operativo.
+- MFI puede tener demanda diferente por línea y periodo, y los puestos no utilizados se configuran en cero. Un periodo sin asignaciones se conserva con su horario, sin provocar error de índice.
+- Los datos existentes no se borran; la migración crea la tabla de seguimiento y agrega el campo area a operadores.
+
+PRUEBAS REALIZADAS EN ESTE ENTORNO
+- python -m py_compile para los módulos Python: correcto.
+- Compilación de las 27 plantillas Jinja: correcta.
+- Migración SQLite en base temporal: creó seguimiento_capacitacion, area y las líneas MFI1–MFI4.
+- Simulación con la base de prueba incluida en el ZIP: la generación secuencial del grupo de dos líneas de Producción produjo 11 asignaciones en cada uno de los tres periodos por línea, sin reutilizar operadores en periodos coincidentes.
+- No se pudo ejecutar la aplicación Flask en navegador desde este entorno porque Flask/Waitress no estaban instalados y no hubo acceso a red para instalarlos.
+
+PENDIENTES QUE NO SE DECLARAN TERMINADOS
+- Flujo completo de salida de emergencia, reemplazo por personal sobrante/préstamo, devolución anticipada al puesto original y reincorporación del operador saliente con trazabilidad de todo el evento.
+- Vista consolidada de grupo que muestre simultáneamente las dos líneas de Producción o las cuatro de MFI en un solo lienzo; las tablas individuales de cada línea sí se generan y se consultan seleccionando la línea.
+- Notificaciones automáticas fuera del inicio de sesión (push/correo). Actualmente los avisos aparecen al abrir Inicio.
+- Pruebas integrales de navegador/tableta y validación con datos reales autorizados por la empresa.
+
+SEGURIDAD Y DATOS
+- No introducir diagnósticos médicos en observaciones de capacitación.
+- Mantener el detalle clínico limitado a Enfermería/roles autorizados según acuerdo formal de la planta.
+- Hacer respaldo de instance/rotacion.db antes de actualizar. Esta distribución no incluye una base de datos operativa.

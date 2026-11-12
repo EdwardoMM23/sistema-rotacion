@@ -1,0 +1,24 @@
+CAMBIOS INTEGRADOS - FASE 15 (BASE: sistema_rotacion1OR cop29.zip)
+
+1) PRODUCCIÓN: el generador selecciona el grupo de operadores en el primer periodo y conserva ese mismo grupo durante los tres periodos. Si la demanda total configurada cambia entre periodos, detiene la generación con una explicación para evitar que una persona aparezca asignada en un periodo y desaparezca en otro. Con 12 presentes y 11 puestos constantes, asigna 11 en los tres periodos y deja una persona disponible como apoyo.
+2) APOYO: la tabla de rotaciones muestra a los operadores presentes que no quedaron asignados en esa línea. No se les inventa una estación ni se duplican.
+3) MFI: la inicialización de la base de datos crea MFI1, MFI2, MFI3 y MFI4 como líneas del área MFI. Agrega Int./Visual e IL/Test A al catálogo, además de las estaciones MFI ya existentes.
+4) ALTA DE OPERADORES: el formulario solicita primero el área y filtra las líneas correspondientes. Se agregó el área al catálogo consultado por el formulario.
+5) HABILIDADES: el enlace está visible para Líder, Supervisor y Administrador. Al generar se puede activar/desactivar la preferencia de habilidades.
+6) EDICIÓN: el cambio manual rechaza repetir estación en otro periodo del turno. El intercambio simultáneo también verifica repetición de estación y mantiene la transacción atómica.
+7) ACCESO: desde la tabla se puede abrir edición flexible, registrar habilidades y abrir el intercambio directamente para el periodo correspondiente.
+8) PRUEBA AUTOMÁTICA: verificar_fase15.py crea una base temporal y valida las líneas MFI, el escenario 12 presentes/11 puestos, grupo fijo y estaciones distintas.
+
+VALIDACIONES REALIZADAS EN ESTE ENTORNO
+- python -m py_compile *.py: correcto.
+- 26 plantillas Jinja: parseo correcto.
+- verificar_fase15.py: correcto.
+- Inicialización SQLite temporal: MFI1-MFI4 creadas correctamente.
+- No se ejecutó la aplicación Flask completa ni se probó en navegador/tableta porque Flask no está instalado en el entorno de construcción. Completar PRUEBAS_FASE15.txt.
+
+LIMITACIONES QUE SIGUEN PENDIENTES
+- En Producción se requiere igual total de puestos en los tres periodos para conservar el mismo grupo durante el turno.
+- En MFI la demanda puede variar por periodo; el personal sin puesto en un periodo debe revisarse como apoyo según la operación real.
+- El reemplazo por emergencia se hace con las funciones actuales de mover/intercambiar y préstamos; no se creó todavía un flujo especializado de un solo botón.
+- La lista de apoyo muestra personas de la plantilla de la línea que están presentes y no aparecen asignadas. La transferencia a otra línea debe registrarse mediante préstamo aprobado.
+- La interfaz de intercambio se validó por sintaxis, no por sesión real de navegador.

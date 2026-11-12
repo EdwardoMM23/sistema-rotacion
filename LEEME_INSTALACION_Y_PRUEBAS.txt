@@ -1,0 +1,33 @@
+PARCHE DE PRUEBA — ROTACIONES Y TABLETAS
+
+ARCHIVOS INCLUIDOS
+- app.py: autorizaciones de estaciones limitadas al rol Administrador; guardado de restricciones compatible con el nuevo formulario.
+- generador.py: no permite repetir una estación para el mismo operador dentro del turno; si no existe solución válida, devuelve orientación y no relaja esa regla. También avisa y bloquea la generación si hay más operadores presentes que puestos configurados, para que no excluya personas silenciosamente.
+- templates/base.html: objetivos táctiles y diseño responsive básico; enlace de autorizaciones solo visible para Administración.
+- templates/asistencia.html: controles táctiles de asistencia, con selección visual y marca de estado.
+- templates/restriccion_nueva.html: Enfermería marca estaciones NO permitidas.
+- templates/rotaciones.html: leyenda visual verde = De pie, rosa = Sentado y ajustes responsive.
+
+INSTALACIÓN SEGURA
+1. No instales directamente sobre el sistema productivo. Haz copia de la carpeta y de instance/rotacion.db.
+2. Detén Flask con Ctrl+C.
+3. Extrae el ZIP y copia los archivos conservando las rutas relativas, reemplazando los archivos del proyecto de prueba.
+4. Activa el entorno virtual.
+5. Ejecuta: python -m py_compile app.py generador.py database.py algoritmo.py
+6. Inicia: python app.py
+7. Prueba con datos ficticios y una copia de la base de datos.
+
+CASOS OBLIGATORIOS PARA DEMOSTRACIÓN
+- 12 presentes con 11 puestos requeridos: debe bloquear y explicar el exceso; esta versión no ofrece aún un selector interactivo de los 11 participantes. El líder debe ajustar la lista/demanda según procedimiento aprobado antes de reintentar.
+- Restricción médica en Horno: el operador no debe asignarse a Horno.
+- Intento de repetir estación en otro periodo: el generador debe buscar otra combinación o detenerse con recomendaciones.
+- Préstamo aprobado: comprobar fecha, turno, línea destino, autorización y ausencia de asignación en otra línea.
+- Asistencia en móvil/tableta: comprobar que el estado seleccionado se conserva al enviar el formulario.
+- Autorizaciones: solo Administrador puede abrir/guardar la pantalla.
+
+LIMITACIONES IMPORTANTES
+- Este parche no fue probado en el navegador con la base de datos real de la planta. La sintaxis Python se verifica por separado, pero las pruebas de integración deben hacerse localmente.
+- La prevención de repetición estricta puede producir “sin combinación válida” cuando la demanda/autorizaciones no permiten una solución; eso es intencional, no debe relajarse la seguridad.
+- El selector interactivo para decidir qué operador queda disponible cuando hay más personas que puestos no está implementado en esta entrega; por ahora se bloquea y explica para evitar exclusiones silenciosas.
+- El intercambio automático de operadores al editar asignaciones no está implementado en este parche; si el cambio deja una estación corta, no se debe forzar. Usar la guía del mensaje y reintentar con una combinación válida.
+- No desplegar en red de planta sin autorización de TI, credenciales seguras, respaldo y pruebas en tabletas.

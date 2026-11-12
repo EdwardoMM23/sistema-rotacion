@@ -1,0 +1,63 @@
+Revisé el ZIP que acabas de subir, incluyendo app.py, la base de datos, el generador de rotaciones y las plantillas HTML. Mi conclusión es que ya tienes una buena base, pero todavía hay funciones que aparecen en la interfaz y no están conectadas correctamente en el servidor.
+Por eso, antes de agregar funciones nuevas, la siguiente fase debe ser la Fase 4: completar las funciones pendientes, validar los cambios de estación y comprobar los permisos de cada usuario. Así evitamos construir mejoras sobre partes que todavía no funcionan de extremo a extremo.
+1. Qué encontré en tu versión
+Área	Resultado de la revisión
+Inicio de sesión por rol	La selección del rol se comprueba contra la cuenta de la base de datos.
+Generador	Tiene reglas de autorización, asistencia, restricciones y secuencias; aún necesita más pruebas.
+Tabla de rotaciones	La plantilla espera el detalle de las asignaciones, pero la ruta de Flask no se lo está proporcionando correctamente.
+Cambiar estación	La interfaz tiene el enlace y el formulario, pero no encontré la ruta de servidor que procese el cambio.
+Historial	La pantalla espera una lista de cambios, pero la ruta actual entrega otra variable y no aplica los filtros de la plantilla.
+Cuentas de usuario	La plantilla permite crear y activar o desactivar cuentas, pero la ruta actual solamente muestra la lista.
+Permisos	Hay diferencias entre los roles autorizados en las rutas y los que se muestran en la navegación.
+También observé que la generación de rotaciones no registra de forma consistente qué usuario generó la propuesta. Eso debe corregirse para que el historial sea útil.
+2. Descarga la Fase 4 actualizada
+Preparé un paquete que corrige esas funciones sobre tu proyecto actual, sin incluir ni sustituir tu base de datos.
+
+Sistema de rotación — Fase 4
+Archivos corregidos, comprobación de rutas y guía de instalación.
+
+
+Descargar sistema_rotacion_fase4.zip
+
+El paquete incluye:
+- app.py: rutas para consultar las asignaciones, editar estaciones, gestionar cuentas y consultar el historial.
+- algoritmo.py: corrección del reconocimiento de estaciones con acentos, como Inserción.
+- verificar_fase4.py: comprobación rápida de que existan las rutas principales.
+- GUIA_FASE4.txt: instrucciones detalladas y pruebas que debes realizar.
+3. Cómo instalarla
+1. Detén Flask con Ctrl + C.
+2. Respalda toda tu carpeta y copia aparte instance/rotacion.db.
+3. Descomprime el ZIP.
+4. Reemplaza solamente app.py y algoritmo.py en tu proyecto.
+5. Copia verificar_fase4.py a la raíz de tu proyecto.
+6. Conserva tu base de datos, venv, las plantillas y los demás archivos.
+7. Abre la terminal de VS Code y ejecuta:
+python -m py_compile app.py algoritmo.py database.py generador.py
+python probar_reglas.py
+python verificar_fase4.py
+
+
+El último comando comprueba las rutas de Flask y requiere que tu entorno virtual tenga Flask instalado.
+Después inicia la aplicación:
+python app.py
+
+
+4. Qué debes probar primero
+1. Entra como Líder y abre una rotación ya generada. Comprueba que se vean los operadores y sus tres estaciones.
+2. Abre Cambiar estación e intenta asignar una estación para la que el operador no esté autorizado. El sistema debe rechazar el cambio.
+3. Prueba una secuencia prohibida y una estación bloqueada por una restricción vigente.
+4. Abre Cuentas de usuario, crea una cuenta ficticia, prueba su acceso y después desactívala.
+5. Genera una propuesta de prueba y comprueba que aparezca en Historial quién la generó. Después realiza un cambio válido y comprueba que también quede registrado.
+Una limitación importante: el cambio individual de estación se rechaza si deja una estación con menos operadores de los requeridos. Todavía no está implementado el intercambio simultáneo de dos operadores; esa será una mejora posterior.
+He comprobado la compilación de los archivos Python y ejecutado las pruebas de reglas del algoritmo: los casos probados pasaron. No pude ejecutar una prueba integral de Flask en este entorno, así que necesitamos confirmar los flujos en tu computadora.
+
+5. ¿Qué sigue después de la Fase 4?
+Cuando confirmes que todo funciona, pasaremos a la Fase 5: prueba piloto y mejoras de uso en tablet.
+En esa fase trabajaremos en:
+- Hacer más clara y cómoda la tabla de rotaciones en pantallas pequeñas.
+- Permitir intercambiar dos operadores en una sola operación, manteniendo la cobertura de las estaciones.
+- Mejorar los mensajes para que expliquen por qué una asignación se rechaza y cómo corregirla.
+- Probar jornadas completas con datos ficticios y registrar resultados.
+- Revisar respaldos y recuperación ante errores.
+
+

@@ -1,0 +1,13 @@
+CORRECCIONES A PARTIR DE 4NOV
+1. Impresión: se cambia a orientación horizontal y se elimina el desbordamiento horizontal al imprimir; la tabla se ajusta al ancho de página, con celdas compactas. La vista en pantalla conserva desplazamiento si la tabla es ancha.
+2. Restricciones médicas: el seguimiento distingue Vence hoy, Por vencer (hasta 7 días) y Vencida (desde el día posterior a la fecha final). No se finaliza automáticamente: Enfermería/Administración debe registrar la decisión autorizada. El inicio muestra avisos operativos sin mostrar diagnósticos.
+3. Búsquedas: se normaliza comparación de nombre sin distinguir mayúsculas/minúsculas y el número de empleado se trata como texto. Los formularios usan botón submit explícito.
+4. Se agrega configurar_lineas_produccion.py: crea/activa Línea 1 a Línea 10 y MFI1 a MFI4 sin borrar operadores ni rotaciones.
+5. Se agrega GUIA_DESPLIEGUE_PLANTA_PASO_A_PASO.txt y se incorpora Waitress en requirements; iniciar_servidor.bat usa venv.
+
+LIMITACIONES Y VALIDACIÓN
+- La impresión debe comprobarse en Chrome/Edge con la impresora real y con Guardar como PDF; los controladores pueden variar.
+- Las alertas se muestran al abrir Inicio/Seguimiento; no son notificaciones push ni correos automáticos. Para avisos en segundo plano, el sistema tendría que incorporar un servicio de notificaciones aprobado.
+- No se borran datos de prueba automáticamente. La limpieza oficial requiere respaldo y un procedimiento aprobado por TI para no perder registros válidos.
+- El script de líneas puede renombrar LINEA_PRUEBA1/2 a Línea 1/2 si esos nombres existen y no existe el destino. No borra filas.
+- No se verificó el despliegue dentro de la red real de la empresa.

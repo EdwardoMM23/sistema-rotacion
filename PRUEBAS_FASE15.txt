@@ -1,0 +1,36 @@
+LISTA DE PRUEBAS - FASE 15
+
+A. Prueba automática
+1) Ejecuta: python verificar_fase15.py
+2) Debe confirmar MFI1, MFI2, MFI3 y MFI4.
+3) Debe confirmar que 12 presentes / 11 puestos generan 11 operadores en cada uno de los tres periodos, siempre el mismo grupo, y una persona disponible como apoyo.
+4) Debe confirmar que cada operador asignado utiliza tres estaciones diferentes.
+
+B. Pruebas manuales con datos ficticios
+[ ] Registrar operador en Producción y comprobar filtrado de líneas.
+[ ] Registrar operador en MFI y comprobar MFI1, MFI2, MFI3 y MFI4.
+[ ] Configurar estaciones y demanda de cada MFI por sus dos periodos.
+[ ] Generar Producción con 11 operadores presentes y 11 puestos.
+[ ] Generar Producción con 12 presentes y 11 puestos; revisar que la misma persona quede como apoyo durante toda la jornada.
+[ ] Configurar demanda desigual en Producción; comprobar que la generación se detiene con explicación.
+[ ] Confirmar que ninguna persona repita estación en los tres periodos.
+[ ] Probar Horno -> Pulido; debe rechazarse.
+[ ] Probar IL -> Visual y Visual -> IL consecutivos; deben rechazarse.
+[ ] Probar dos estaciones de pie consecutivas; debe rechazarse.
+[ ] Probar mover a un operador a una estación no autorizada; debe rechazarse.
+[ ] Probar mover a una estación bloqueada por restricción médica; debe rechazarse.
+[ ] Probar mover a un puesto que dejaría descubierta la estación actual; debe explicar que se requiere intercambio.
+[ ] Probar intercambio entre dos operadores autorizados; ambos cambios deben guardarse juntos.
+[ ] Probar intercambio con una autorización faltante; ninguno debe cambiar.
+[ ] Registrar habilidad Alta/Baja y generar con la casilla activada; después desactivarla y generar de nuevo.
+[ ] Registrar préstamo aprobado y comprobar que no se duplique la asignación en el mismo intervalo.
+[ ] Registrar devolución anticipada y revisar el estado del préstamo.
+[ ] Registrar revaloración, ampliación y finalización de una restricción desde Enfermería.
+[ ] Confirmar que archivar un reporte no desactive una restricción activa.
+[ ] Abrir pantalla compartida, editar desde otra sesión y comprobar actualización.
+[ ] Imprimir y guardar PDF desde computadora y tableta.
+
+C. No usar en operación hasta completar
+- Revisar los resultados con líder, supervisor y responsable de Enfermería.
+- Confirmar que las reglas de dotación por estación coinciden con la operación real.
+- Confirmar que el servidor, permisos, respaldos y red interna están autorizados por TI.
