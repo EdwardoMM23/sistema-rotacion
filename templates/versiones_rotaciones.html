@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block titulo %}Versiones de rotaciones{% endblock %}
+{% block contenido %}
+<h1 class="h3">Versiones e historial de rotaciones</h1>
+<p class="text-muted">Consulta versiones vigentes y anteriores. Las versiones anteriores se conservan para trazabilidad y esta pantalla no las modifica.</p>
+<form method="get" class="card card-body mb-3"><div class="row g-2 align-items-end">
+<div class="col-12 col-md-4"><label class="form-label">Línea</label><select class="form-select" name="id_linea" required><option value="">Seleccionar...</option>{% for l in lineas %}<option value="{{l.id_linea}}" {% if id_linea==l.id_linea %}selected{% endif %}>{{l.nombre_linea}}</option>{% endfor %}</select></div>
+<div class="col-6 col-md-3"><label class="form-label">Fecha</label><input class="form-control" type="date" name="fecha" value="{{fecha}}" required></div>
+<div class="col-6 col-md-2"><label class="form-label">Turno</label><select class="form-select" name="turno"><option value="Matutino" {% if turno=='Matutino' %}selected{% endif %}>Matutino</option><option value="Vespertino" {% if turno=='Vespertino' %}selected{% endif %}>Vespertino</option></select></div>
+<div class="col-12 col-md-3"><button class="btn btn-primary w-100">Consultar versiones</button></div></div></form>
+{% if id_linea %}
+<a class="btn btn-outline-primary mb-3" href="{{url_for('editor_rotaciones',id_linea=id_linea,fecha=fecha,turno=turno)}}">Volver a edición</a>
+{% if versiones %}{% for v in versiones %}
+<div class="card mb-3"><div class="card-header d-flex flex-wrap justify-content-between gap-2"><strong>Versión {{v.numero_rotacion}} · {{v.hora_inicio}}</strong><span class="badge {% if v.estado=='Cancelada' %}text-bg-secondary{% elif v.estado=='Modificada' %}text-bg-warning{% else %}text-bg-success{% endif %}">{{v.estado}}</span></div>
+<div class="card-body"><div class="small text-muted mb-2">Generada: {{v.fecha_generacion}} · Responsable: {{v.nombre_completo or 'No disponible'}} · Asignaciones: {{v.total_asignaciones}} · Último evento: {{v.ultimo_cambio or 'Sin eventos'}}</div>
+<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Periodo</th><th>Empleado</th><th>Estación</th></tr></thead><tbody>{% for a in v.asignaciones %}<tr><td>{{a.hora_inicio}}–{{a.hora_fin}}</td><td>{{a.numero_empleado}} — {{a.nombre}}</td><td>{{a.nombre_estacion}}</td></tr>{% endfor %}</tbody></table></div>
+{% if v.eventos %}<details><summary>Ver historial de cambios ({{v.eventos|length}})</summary><ul class="mt-2">{% for e in v.eventos %}<li><strong>{{e.fecha_hora}} · {{e.tipo_cambio}}</strong> — {{e.descripcion}}{% if e.motivo %}<br><span class="text-muted">Motivo: {{e.motivo}}</span>{% endif %}<br><small class="text-muted">Responsable: {{e.nombre_completo or 'No disponible'}}</small></li>{% endfor %}</ul></details>{% endif %}
+</div></div>
+{% endfor %}{% else %}<div class="alert alert-info">No hay versiones guardadas para los filtros seleccionados.</div>{% endif %}
+{% endif %}
+{% endblock %}

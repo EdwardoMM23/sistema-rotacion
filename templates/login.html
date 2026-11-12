@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block titulo %}Iniciar sesión<script>function alternarPassword(id, boton){const campo=document.getElementById(id);const mostrar=campo.type==='password';campo.type=mostrar?'text':'password';boton.textContent=mostrar?'Ocultar':'Mostrar';}</script>
+{% endblock %}
+{% block contenido %}
+<div class="row justify-content-center py-3">
+  <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4 p-md-5">
+        <div class="text-center mb-4">
+          <div class="display-6 mb-2" aria-hidden="true">🔐</div>
+          <h1 class="h3 mb-2">Sistema de Rotación</h1>
+          <p class="text-muted mb-0">Selecciona tu tipo de usuario e inicia sesión.</p>
+        </div>
+
+        <form method="post" action="{{ url_for('login', siguiente=request.args.get('siguiente', '')) if request.args.get('siguiente') else url_for('login') }}">
+          <div class="mb-3">
+            <label class="form-label fw-semibold" for="rol">¿Qué tipo de usuario eres?</label>
+            <select class="form-select form-select-lg" id="rol" name="rol" required>
+              <option value="" {% if not rol_seleccionado %}selected{% endif %} disabled>Selecciona una opción</option>
+              <option value="Administrador" {% if rol_seleccionado == 'Administrador' %}selected{% endif %}>Administrador</option>
+              <option value="Lider" {% if rol_seleccionado == 'Lider' %}selected{% endif %}>Líder de producción</option>
+              <option value="Supervisor" {% if rol_seleccionado == 'Supervisor' %}selected{% endif %}>Supervisor</option>
+              <option value="Enfermeria" {% if rol_seleccionado == 'Enfermeria' %}selected{% endif %}>Enfermería (Doctor/a o Enfermero/a)</option>
+            </select>
+            <div class="form-text">Elige el perfil que te asignó el administrador.</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold" for="nombre_usuario">Nombre de usuario</label>
+            <input class="form-control form-control-lg" id="nombre_usuario" name="nombre_usuario"
+                   autocomplete="username" required autofocus>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-semibold" for="contrasena">Contraseña</label>
+            <div class="input-group input-group-lg"><input class="form-control" type="password" id="contrasena" name="contrasena" autocomplete="current-password" required><button class="btn btn-outline-secondary" type="button" onclick="alternarPassword('contrasena', this)" aria-label="Mostrar u ocultar contraseña">Mostrar</button></div>
+          </div>
+
+          <button class="btn btn-primary btn-lg w-100" type="submit">Iniciar sesión</button>
+        </form>
+        <p class="text-center mt-3 mb-2">¿No tienes cuenta? <a href="{{ url_for('solicitar_cuenta') }}">Solicitar cuenta de líder</a></p>
+        <p class="text-muted small text-center mt-3 mb-0">
+          Si no puedes entrar, confirma con el administrador el tipo de usuario asignado a tu cuenta.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+<script>function alternarPassword(id, boton){const campo=document.getElementById(id);const mostrar=campo.type==='password';campo.type=mostrar?'text':'password';boton.textContent=mostrar?'Ocultar':'Mostrar';}</script>
+{% endblock %}

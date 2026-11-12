@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block titulo %}Habilidades por estación{% endblock %}
+{% block contenido %}
+<h1 class="h3 mb-2">Habilidades por estación</h1>
+<p class="text-muted">La líder registra el nivel observado para cada operador y cada estación activa. La habilidad ayuda a priorizar la asignación, pero nunca sustituye una autorización ni una validación médica.</p>
+<form method="get" class="card card-body mb-3">
+  <label class="form-label" for="buscar_operador">Buscar por número o nombre</label>
+  <input class="form-control mb-2" id="buscar_operador" name="q" value="{{busqueda}}" placeholder="Ej. 001 o Eduardo">
+  <label class="form-label" for="id_operador">Operador</label>
+  <select class="form-select mb-3" name="id_operador" id="id_operador" required>
+    <option value="">Selecciona operador</option>
+    {% for o in operadores %}<option value="{{o.id_operador}}" {% if id_operador == o.id_operador %}selected{% endif %}>{{o.numero_empleado}} — {{o.nombre}}</option>{% endfor %}
+  </select>
+  <button class="btn btn-outline-primary">Cargar habilidades</button>
+</form>
+{% if id_operador %}
+<form method="post" class="card card-body" id="form-habilidades">
+  <input type="hidden" name="id_operador" value="{{id_operador}}">
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
+  {% for e in estaciones %}
+    {% set nivel_actual = actuales.get(e.id_estacion, 'Media') %}
+    <div class="col"><section class="card h-100 skill-card"><div class="card-body">
+      <div class="fw-semibold mb-3">{{e.nombre_estacion}}</div>
+      <div class="d-grid gap-2" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+        <input class="btn-check" type="radio" autocomplete="off" id="hab_{{e.id_estacion}}_baja" name="nivel_{{e.id_estacion}}" value="Baja" {% if nivel_actual == 'Baja' %}checked{% endif %}>
+        <label class="btn btn-outline-secondary skill-choice" for="hab_{{e.id_estacion}}_baja">BAJA</label>
+        <input class="btn-check" type="radio" autocomplete="off" id="hab_{{e.id_estacion}}_media" name="nivel_{{e.id_estacion}}" value="Media" {% if nivel_actual == 'Media' %}checked{% endif %}>
+        <label class="btn btn-outline-primary skill-choice" for="hab_{{e.id_estacion}}_media">MEDIA</label>
+        <input class="btn-check" type="radio" autocomplete="off" id="hab_{{e.id_estacion}}_alta" name="nivel_{{e.id_estacion}}" value="Alta" {% if nivel_actual == 'Alta' %}checked{% endif %}>
+        <label class="btn btn-outline-success skill-choice" for="hab_{{e.id_estacion}}_alta">ALTA</label>
+      </div>
+    </div></section></div>
+  {% endfor %}
+  </div>
+  <div class="d-flex flex-wrap align-items-center gap-3 mt-3">
+    <button class="btn btn-primary btn-lg" type="submit">Guardar habilidades</button>
+    <span class="small text-muted">Selecciona un nivel por estación. El botón seleccionado quedará resaltado.</span>
+  </div>
+</form>
+<style>
+.skill-choice{min-height:48px;display:flex;align-items:center;justify-content:center;font-weight:700;cursor:pointer;user-select:none}
+.btn-check:checked + .skill-choice{color:#fff;box-shadow:0 0 0 .2rem rgba(112,41,99,.18);transform:translateY(-1px)}
+.btn-check:focus-visible + .skill-choice{outline:3px solid #222;outline-offset:2px}
+</style>
+{% endif %}
+{% endblock %}

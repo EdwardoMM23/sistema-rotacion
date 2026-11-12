@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block titulo %}Inicio{% endblock %}
+
+{% block contenido %}
+<div class="p-4 p-md-5 mb-4 bg-white rounded-3 shadow-sm text-center">
+    <h1 class="display-6 titulo-rotacion">Rotación de Operadores</h1>
+    <p class="lead">
+        Administración de operadores, asistencia y rotaciones de producción.
+    </p>
+    <p class="text-secondary">Plataforma de gestión de operadores, certificaciones, restricciones laborales y rotaciones.</p>
+</div>
+
+
+
+{% if alertas_evaluacion %}
+<div class="alert alert-warning shadow-sm"><h2 class="h5">Evaluaciones pendientes o programadas</h2><p class="mb-2">Hay operadores cuya fecha de evaluación llegó o ya venció. La administradora debe actualizar el resultado.</p>
+<div class="table-responsive"><table class="table table-sm table-bordered mb-0"><thead><tr><th>Empleado</th><th>Estación</th><th>Estado</th><th>Fecha programada</th></tr></thead><tbody>{% for a in alertas_evaluacion %}<tr><td>{{a.numero_empleado}} — {{a.nombre}}</td><td>{{a.nombre_estacion}}</td><td>{{a.estado}}</td><td>{{a.fecha_evaluacion}}</td></tr>{% endfor %}</tbody></table></div>
+{% if session.get('rol') in ['Administrador','Supervisor'] %}<a class="btn btn-sm btn-outline-dark mt-2" href="{{url_for('certificaciones')}}">Actualizar evaluaciones</a>{% endif %}</div>
+{% endif %}
+
+{% if alertas_restricciones %}
+<div class="alert alert-warning shadow-sm" role="alert">
+  <h2 class="h5">Avisos de restricciones laborales</h2>
+  <p class="mb-2">Revisa las fechas y estaciones antes de confirmar las rotaciones. Este aviso no muestra diagnósticos ni observaciones clínicas.</p>
+  <div class="table-responsive"><table class="table table-sm table-bordered align-middle mb-0"><thead><tr><th>Empleado</th><th>Vigencia</th><th>Desde</th><th>Hasta</th><th>Estaciones no permitidas</th></tr></thead><tbody>
+  {% for a in alertas_restricciones %}<tr><td>{{a.numero_empleado}} — {{a.nombre}}</td><td><span class="badge {{ 'text-bg-success' if a.vigencia == 'Vigente' else ('text-bg-warning' if a.vigencia == 'Programada' else 'text-bg-secondary') }}">{{a.vigencia}}</span></td><td>{{a.fecha_inicio}}</td><td>{{a.fecha_fin or 'Sin fecha final'}}</td><td>{{a.no_permitidas or 'Revisar detalle operativo'}}</td></tr>{% endfor %}
+  </tbody></table></div>
+  <a class="btn btn-sm btn-outline-dark mt-2" href="{{url_for('reporte_restricciones')}}">Abrir reporte operativo</a>
+</div>
+{% endif %}
+
+<div class="row g-4">
+    <!-- Operadores -->
+    <div class="col-12 col-md-6 col-lg-4">
+        <div class="card h-100 bg-primary text-white shadow-sm">
+            <div class="card-body">
+                <h2 class="h5">Operadores</h2>
+                <p>Consulta, registra y administra operadores.</p>
+                <a href="{{ url_for('operadores') }}" class="btn btn-light w-100">Abrir</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Autorizaciones -->
+    <div class="col-12 col-md-6 col-lg-4">
+        <div class="card h-100 bg-primary text-white shadow-sm">
+            <div class="card-body">
+                <h2 class="h5">Autorizaciones</h2>
+                <p>Configura las estaciones autorizadas.</p>
+                <a href="{{ url_for('autorizaciones') }}" class="btn btn-light w-100">Abrir</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Asistencia -->
+    <div class="col-12 col-md-6 col-lg-4">
+        <div class="card h-100 bg-primary text-white shadow-sm">
+            <div class="card-body">
+                <h2 class="h5">Asistencia</h2>
+                <p>Confirma la disponibilidad de operadores.</p>
+                <a href="{{ url_for('asistencia') }}" class="btn btn-light w-100">Abrir</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Restricciones laborales -->
+    <div class="col-12 col-md-6 col-lg-4">
+        <div class="card h-100 bg-primary text-white shadow-sm">
+            <div class="card-body">
+                <h2 class="h5">Restricciones laborales</h2>
+                <p>Consulta restricciones activas, seguimiento, revaloraciones e historial autorizado.</p>
+                <a href="{{ url_for('restricciones') }}" class="btn btn-light w-100">Administrar restricciones</a>
+            </div>
+        </div>
+    </div>
+    {% if session.get('rol') in ['Administrador','Supervisor'] %}
+    <div class="col-12 col-md-6 col-lg-4"><div class="card h-100 bg-primary text-white shadow-sm"><div class="card-body"><h2 class="h5">Capacitación y certificaciones</h2><p>Registra estaciones pendientes, entrenamiento y fechas de evaluación.</p><a href="{{url_for('certificaciones')}}" class="btn btn-light w-100">Abrir seguimiento</a></div></div></div>
+    {% endif %}
+
+    <!-- Rotaciones -->
+    <div class="col-12 col-md-6 col-lg-4">
+        <div class="card h-100 bg-primary text-white shadow-sm">
+            <div class="card-body">
+                <h2 class="h5">Rotaciones</h2>
+                <p>Consulta las rotaciones guardadas.</p>
+                <a href="{{ url_for('rotaciones') }}" class="btn btn-light w-100">Abrir</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

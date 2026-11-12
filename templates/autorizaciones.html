@@ -1,0 +1,53 @@
+
+{% extends "base.html" %}
+
+{% block titulo %}Autorizaciones{% endblock %}
+
+{% block contenido %}
+<div class="mb-4">
+    <h1 class="text-primary">Autorizaciones por operador</h1>
+    <p class="text-secondary">
+        Marca solamente las estaciones en las que el operador está autorizado.
+    </p>
+</div>
+
+<!-- Formulario de selección de operador -->
+<form method="get" class="card card-body shadow-sm mb-4">
+    <label class="form-label fw-bold" for="buscar_operador">Buscar por número o nombre</label>
+    <input class="form-control mb-2" id="buscar_operador" name="q" value="{{busqueda}}" placeholder="Ej. 001 o Eduardo" autocomplete="off">
+    <label class="form-label fw-bold" for="id_operador">Operador</label>
+
+    <select class="form-select mb-3" id="id_operador"
+            name="id_operador" required>
+        <option value="">Selecciona un operador</option>
+        {% for operador in operadores %}
+        <option value="{{ operador.id_operador }}"
+            {% if id_operador == operador.id_operador %}selected{% endif %}>
+            {{ operador.numero_empleado }} — {{ operador.nombre }}
+        </option>
+        {% endfor %}
+    </select>
+
+    <button class="btn btn-primary w-100" type="submit">
+        Consultar autorizaciones
+    </button>
+</form>
+
+{% if id_operador %}
+<form method="post" class="card card-body shadow-sm">
+    <input type="hidden" name="id_operador" value="{{ id_operador }}">
+
+    <h2 class="h5 text-primary mb-3">Estaciones autorizadas</h2>
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-2">
+        {% for estacion in estaciones %}<div class="col"><label class="card card-body h-100 flex-row align-items-center gap-2 p-3"><input class="form-check-input" type="checkbox" name="estacion_{{estacion.id_estacion}}" id="estacion_{{estacion.id_estacion}}" {% if estacion.id_estacion in autorizadas %}checked{% endif %}><span>{{estacion.nombre_estacion}}</span></label></div>{% endfor %}
+    </div>
+
+    <button class="btn btn-success w-100 mt-3" type="submit">
+        Guardar autorizaciones
+    </button>
+</form>
+{% endif %}
+{% endblock %}
+
+<script>document.getElementById('buscar_operador')?.addEventListener('input',function(){const q=this.value.toLocaleLowerCase();const s=document.getElementById('id_operador');for(const o of s.options){o.hidden=!!o.value&&!o.text.toLocaleLowerCase().includes(q);}});</script>

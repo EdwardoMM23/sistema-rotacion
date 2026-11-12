@@ -1,0 +1,66 @@
+GUÍA OPERATIVA — FASE 16
+
+ANTES DE ACTUALIZAR
+1. Cierra el sistema.
+2. Copia toda la carpeta instance, especialmente rotacion.db, a un respaldo externo.
+3. Extrae el paquete Fase 16 en una carpeta nueva. No mezcles archivos con una versión anterior sin respaldo.
+4. Copia tu base de datos respaldada a la carpeta instance del proyecto nuevo. No reemplaces la base con una base de ejemplo.
+5. Activa tu entorno virtual existente o ejecuta CONFIGURAR_PRIMERA_VEZ.bat si es instalación nueva.
+6. Inicia la aplicación. database.py ejecuta migraciones no destructivas al iniciar.
+
+1. INICIO Y RESTRICCIONES
+- La tarjeta Restricciones Laborales ya no aparece como «Próximamente» ni en gris.
+- El módulo permite consultar restricciones y seguimiento según el rol autorizado.
+- Las alertas operativas muestran estaciones no permitidas y vigencia, nunca diagnósticos.
+
+2. REGISTRO DE OPERADORES
+- Selecciona Producción y después la línea correspondiente.
+- Selecciona MFI para registrar al operador como parte del área MFI; no necesitas elegir MFI1–MFI4 en este formulario.
+- La asignación a línea MFI se realiza al organizar la asistencia y las rotaciones. En esta versión, asistencia de MFI se captura a nivel de área: al seleccionar cualquiera de MFI1–MFI4 aparece el personal MFI del turno.
+
+3. PUESTOS POR LÍNEA
+- Las líderes, Supervisión y Administración pueden abrir Puestos por línea.
+- Producción: configura la cantidad requerida por estación y periodo. Para una rotación estable de turno, mantén la misma cantidad total de operadores entre los tres periodos.
+- MFI: configura cada línea MFI1, MFI2, MFI3 y MFI4 por separado. Captura solo las estaciones necesarias; deja en cero las que no se utilizan. La demanda puede variar entre los dos periodos matutinos.
+
+4. GENERACIÓN POR GRUPO
+- En Rotaciones, selecciona una línea del grupo, fecha y turno.
+- Usa «Generar grupo completo» para procesar conjuntamente las líneas 1–2, 3–4, 5–6, 7–8 o 9–10. El grupo se determina por el orden de registro de las líneas activas de Producción.
+- Para MFI, «Generar grupo completo» procesa MFI1, MFI2, MFI3 y MFI4.
+- La operación se realiza en una sola transacción: si alguna línea no puede generar una propuesta, se revierten los cambios y se mantienen las versiones anteriores.
+- Después de generar, selecciona cada línea en el filtro para revisar su tabla individual. Revisa la dotación y todas las restricciones antes de usarla.
+- La generación individual permanece disponible para una sola línea; úsala únicamente cuando sepas que no estás sustituyendo la planificación del grupo compartido.
+
+5. ORDEN DE TABLAS
+- La tabla principal presenta las estaciones como columnas y los periodos como filas, siguiendo el orden operativo del catálogo.
+- La pantalla compartida muestra tarjetas ordenadas por el mismo catálogo.
+- En impresión, usa orientación horizontal y «Guardar como PDF» si necesitas conservar una copia.
+
+6. CAPACITACIÓN Y CERTIFICACIONES
+- Entra a Capacitación desde el menú. Busca por número o nombre.
+- Selecciona operador y estación.
+- Pendiente: aún no inicia entrenamiento.
+- En entrenamiento: está aprendiendo y todavía no se autoriza.
+- Evaluación programada: indica la fecha que definió la administradora.
+- Autorizado: registra el resultado aprobado y el sistema activa la autorización de esa estación.
+- No aprobado: el sistema mantiene bloqueada la estación.
+- Al llegar o pasar la fecha programada, aparecerá un aviso en Inicio para Administración/Supervisión y las líderes del ámbito correspondiente.
+- La habilidad Baja/Media/Alta es distinta de la certificación: no habilita por sí sola una estación.
+
+7. BUSCADORES Y HABILIDADES
+- En Autorizaciones y Habilidades escribe parte del número o nombre para filtrar la lista.
+- En Habilidades utiliza los botones Baja, Media o Alta en las tarjetas. Son controles grandes para uso táctil.
+
+8. MOVIMIENTOS Y EMERGENCIAS
+- Mover e intercambiar asignaciones existentes sigue disponible en Edición flexible.
+- Para una emergencia real, no borres registros ni edites directamente la base de datos. Registra el cambio con motivo e informa a Supervisión.
+- El flujo automatizado integral de salida, reemplazo, devolución y reincorporación todavía está pendiente de la siguiente fase; esta entrega no lo presenta como terminado.
+
+9. PRUEBAS ANTES DE LA ENTREGA
+- Ejecuta python verificar_fase16.py.
+- Prueba generación grupal Producción con dos líneas y personal presente en ambas.
+- Comprueba que un operador no se asigne a dos líneas en el mismo intervalo.
+- Prueba MFI con diferentes estaciones/demandas en cada una de las cuatro líneas y con periodos de demanda cero.
+- Programa una evaluación para hoy y confirma que aparece el aviso.
+- Cambia el estado a Autorizado y confirma que se activa la autorización.
+- Prueba en computadora y tableta, incluyendo impresión/PDF.

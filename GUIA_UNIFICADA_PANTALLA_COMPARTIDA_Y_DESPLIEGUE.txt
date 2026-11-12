@@ -1,0 +1,98 @@
+SISTEMA DE ROTACIONES — PAQUETE INTEGRADO (FASE 13)
+==================================================
+
+OBJETIVO
+Este paquete reúne el proyecto base y los cambios de supervisión/regeneración, habilidades como preferencia, seguimiento de restricciones, préstamos, configuración MFI, pantalla compartida y edición flexible/historial. Es una versión integrada para pruebas, no una certificación de producción.
+
+IMPORTANTE: QUÉ SIGNIFICA “SIN PYTHON NI VISUAL STUDIO”
+------------------------------------------------------
+- En las TABLETAS y computadoras que solo consultan o editan por navegador NO se instala Python ni Visual Studio Code. Solo necesitan un navegador actualizado y conexión a la red autorizada.
+- La aplicación web necesita ejecutarse en algún SERVIDOR. Puede ser un PC autorizado de la planta o un servidor interno de TI.
+- Si no quieren instalar Python en el equipo servidor, TI puede preparar/publicar el servicio en un servidor interno o compilar y probar un ejecutable para Windows. Este ZIP incluye el código y los pasos, pero NO incluye un .exe compilado ni una instalación en la red de la empresa. No es seguro prometer funcionamiento sin preparar el servidor.
+- No publiques el sistema directamente en Internet. Antes de datos reales, solicita autorización de TI, respaldo, control de acceso y revisión de seguridad.
+
+CONTENIDO PRINCIPAL
+-------------------
+- Edición flexible de asignaciones y pantalla de intercambio simultáneo.
+- Generación de nueva propuesta sin cancelar la propuesta vigente si falla la generación.
+- Consulta de registros/versiones anteriores.
+- Pantalla compartida de solo lectura para dejar abierta en un monitor o computadora.
+- Impresión desde navegador y opción “Guardar como PDF”.
+- Funciones existentes del proyecto base, conservando plantillas no reemplazadas por la fase reciente.
+- Scripts de configuración de desarrollo en Windows.
+
+ANTES DE INSTALAR
+-----------------
+1. No reemplaces tu proyecto actual. Extrae este ZIP en una carpeta nueva, por ejemplo Escritorio\Sistema_Rotacion_Integrado_Fase13.
+2. Haz una copia aparte de tu proyecto anterior y de su archivo instance\rotacion.db. No uses datos reales en las primeras pruebas.
+3. Si vas a conservar datos existentes, NO copies una base de datos vieja sobre esta carpeta sin revisar el esquema y las migraciones. Primero valida en una copia y con respaldo.
+4. Este paquete no incluye las carpetas .venv/venv ni una base de datos personal; eso evita transportar instalaciones locales o datos de prueba de versiones anteriores.
+
+PRUEBA LOCAL EN WINDOWS (EQUIPO DE DESARROLLO/SERVIDOR)
+-------------------------------------------------------
+1. Instala Python 3.11 o 3.12 desde la fuente oficial si el equipo está autorizado para desarrollo. Visual Studio Code es opcional; se puede iniciar con los scripts .bat.
+2. Ejecuta CONFIGURAR_PRIMERA_VEZ.bat. Si Windows bloquea la ejecución, consulta al área de TI en lugar de cambiar políticas de seguridad.
+3. Configura SECRET_KEY como variable de entorno privada de Windows. No uses una clave publicada ni la pongas en capturas o archivos que compartirás.
+4. Ejecuta INICIAR_DESARROLLO.bat.
+5. En el mismo equipo abre el navegador y entra a http://127.0.0.1:8080. Si la aplicación existente indica otra ruta o puerto, usa el que realmente muestre la terminal/configuración.
+6. Si aparece un error, guarda el texto completo de la terminal y no borres la base de datos para “arreglarlo”.
+
+CÓMO USAR LA PANTALLA COMPARTIDA
+--------------------------------
+1. Inicia el servidor en el equipo autorizado que actuará como host.
+2. En ese equipo abre la aplicación e inicia sesión con una cuenta autorizada.
+3. Entra a Rotaciones y selecciona el enlace/botón “Pantalla compartida” (la ruta de esta versión es /pantalla-rotaciones). Verifica la ruta exacta en los botones de la interfaz.
+4. Deja esa pestaña abierta en el monitor o computadora de consulta. La pantalla es para visualizar; los cambios se hacen desde la pantalla de edición en un dispositivo autorizado.
+5. Desde una tableta conectada a la MISMA red autorizada, abre el navegador y escribe la dirección IP local del servidor, por ejemplo http://192.168.1.25:8080. La IP es solo un ejemplo: utiliza la dirección real que proporcione TI; no adivines ni publiques la IP.
+6. Si la tableta no puede abrirla, verifica con TI que ambos dispositivos estén en la red correcta y que el firewall permita el puerto configurado. No desactives el firewall.
+7. Cambia una asignación de prueba desde la tableta y confirma si la pantalla compartida se actualiza al recargar. Si no se actualiza sola, usa recargar; no se debe asumir que tiene actualización automática en tiempo real.
+8. Para imprimir o guardar PDF, usa el menú del navegador → Imprimir → “Guardar como PDF”. Comprueba que no se corten nombres/periodos y que la orientación sea legible.
+
+PRUEBAS MÍNIMAS ANTES DE USO REAL
+---------------------------------
+- Inicio de sesión, roles y permisos.
+- Asistencia: presentes, ausentes y pendientes.
+- Autorizaciones por estación y restricciones vigentes.
+- Generar una propuesta válida; generar otra y confirmar que el historial conserva la anterior.
+- Provocar una generación inválida SOLO en la copia de pruebas y comprobar que la propuesta activa anterior sigue intacta.
+- Mover operador, intercambiar dos operadores y comprobar reglas de autorización, restricciones y ergonomía.
+- Probar estación Horno→Pulido, IL→Visual, Visual→IL consecutivas y estaciones de pie consecutivas; las secuencias prohibidas deben rechazarse.
+- Verificar que una misma persona no aparezca asignada a dos líneas/puestos a la vez.
+- Probar pantalla compartida e impresión/PDF desde PC y tableta.
+- Revisar registros de cambios, versiones, préstamo/retorno y flujo de restricciones con las personas autorizadas.
+- No introducir diagnósticos ni datos médicos reales en pruebas. El acceso a información clínica debe limitarse según la política de la empresa.
+
+CÓMO HACERLO ACCESIBLE SIN INSTALAR PYTHON EN CADA TABLETA/PC
+-------------------------------------------------------------
+Arquitectura recomendada:
+[Servidor interno autorizado: ejecuta la aplicación y guarda la base de datos]
+                     | red interna autorizada
+        +------------+-------------+
+        |            |             |
+   [Tableta]    [PC líder]   [Monitor compartido]
+   navegador     navegador       navegador
+
+La aplicación y la base de datos deben permanecer en el servidor; no copies una base distinta a cada tableta porque se crearían datos separados. Las tabletas no necesitan Python ni VS Code.
+
+OPCIÓN A — SERVIDOR INTERNO DE TI (RECOMENDADA)
+- TI instala/ejecuta la aplicación en un servidor de la empresa, configura servicio automático, HTTPS si corresponde, usuarios, permisos, respaldos y monitoreo.
+- Las tabletas y PCs entran por una dirección interna aprobada.
+- Esta es la opción más estable para uso continuo, pero necesita autorización y configuración de TI.
+
+OPCIÓN B — EJECUTABLE PARA UN PC WINDOWS AUTORIZADO
+- Puede prepararse un ejecutable/paquete con herramientas como PyInstaller para evitar instalar Python en el PC host, pero debe construirse y probarse en Windows con las dependencias y carpetas templates/static incluidas.
+- Este ZIP NO contiene el ejecutable compilado. No se debe usar un .exe sin probar, revisar seguridad y confirmar que la base de datos se guarda en una carpeta persistente con permisos adecuados.
+- Incluso con .exe, el PC host debe estar encendido y conectado para que las demás tabletas entren. Si se apaga, la aplicación deja de estar disponible.
+
+LIMITACIONES CONOCIDAS
+----------------------
+- El paquete se integró sobre el proyecto base incluido en la conversación y se sustituyeron app.py, database.py, generador.py y las plantillas de la fase 13; se conservaron las plantillas y archivos auxiliares no sustituidos.
+- Se comprobó la sintaxis de Python de los módulos principales. No se pudo realizar aquí una prueba integral con navegador, base de datos real, usuarios/roles y dispositivos de la planta.
+- La vista de versiones puede mostrar registros por periodo según el esquema actual; verificar que la presentación corresponda a cómo supervisión entiende una “propuesta completa”.
+- La pantalla compartida podría requerir recarga manual si no hay actualización automática configurada.
+- El paquete no instala un servicio de Windows, no configura firewall/red, no publica el sistema y no crea un .exe final.
+- Antes de operar con personas reales, validar reglas con supervisión, líderes, Enfermería y TI.
+
+SI FALLA
+---------
+No borres archivos ni bases de datos. Copia el mensaje completo de error, indica qué botón/ruta estabas usando y qué esperabas que ocurriera. Oculta nombres, números de empleado y datos médicos en capturas.

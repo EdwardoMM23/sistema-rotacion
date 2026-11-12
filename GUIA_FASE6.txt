@@ -1,0 +1,80 @@
+FASE 6 — HISTORIAL, ESTADOS, SOLICITUD DE CUENTA Y PRÉSTAMOS
+
+IMPORTANTE
+- Esta actualización es para pruebas controladas, no para desplegar directamente en producción.
+- Antes de instalar, cierra Flask con Ctrl+C y haz una copia completa del proyecto.
+- Respalda especialmente instance/rotacion.db. Nunca sustituyas la base de datos con una incluida en un ZIP.
+- Usa datos ficticios para probar reportes médicos.
+- La actualización de esquema es aditiva: añade columnas/tablas y no borra los registros existentes.
+
+ARCHIVOS QUE DEBES COPIAR DESDE ESTE PARCHE
+1. app.py
+2. database.py
+3. static/css/styles.css
+4. templates/base.html
+5. templates/login.html
+6. templates/solicitar_cuenta.html (nuevo)
+7. templates/usuarios.html
+8. templates/operadores.html
+9. templates/restricciones.html
+10. templates/historial_restricciones.html (nuevo)
+11. templates/prestamos.html (nuevo)
+12. templates/reporte_medico_detalle.html
+13. GUIA_FASE6.txt
+14. verificar_fase6.py
+
+No copies la carpeta venv ni la base de datos del ZIP. Conserva el requirements.txt y tu instancia/rotacion.db actuales.
+
+INSTALACIÓN
+1. Cierra el servidor Flask.
+2. Haz el respaldo indicado arriba.
+3. Copia los archivos manteniendo las rutas de carpetas.
+4. Abre la terminal de VS Code en la carpeta donde está app.py.
+5. Ejecuta:
+   python -m py_compile app.py database.py algoritmo.py generador.py
+   python probar_reglas.py
+   python verificar_fase6.py
+6. Inicia con:
+   python app.py
+   La migración de la base de datos se ejecuta cuando se inicia app.py directamente.
+
+PRUEBAS GUIADAS
+A. Inicio de sesión y solicitudes de cuenta
+- En la pantalla de login pulsa “Solicitar cuenta de líder”.
+- Crea una solicitud con nombre, usuario y contraseña de al menos 10 caracteres.
+- Usa los botones Mostrar/Ocultar y comprueba la confirmación de contraseña.
+- La cuenta no debe poder iniciar sesión hasta que un administrador la apruebe.
+- Entra con una cuenta Administrador ya existente, abre Cuentas de usuario y aprueba la solicitud.
+- Comprueba que el formulario público NO permite solicitar Supervisor, Enfermería ni Administrador.
+- Los administradores todavía pueden crear esos roles desde el panel protegido existente.
+
+B. Estados de operadores
+- En Operadores, con rol Supervisor o Administrador, prueba Activo, Vacaciones, Incapacidad, Permiso por horas y Baja usando solo datos ficticios.
+- Los estados distintos de Activo quedan excluidos del algoritmo actual mediante activo=0.
+- IMPORTANTE: “Permiso por horas” en esta versión también excluye al operador de toda la generación; todavía no aplica un rango horario parcial. No lo uses como control automático hasta implementar y probar esa lógica.
+- Para reincorporar al operador, cambia su estado a Activo. No borres operadores con historial.
+- El campo de nota es operativo; no escribas diagnósticos médicos allí.
+
+C. Historial médico
+- Con rol Enfermería, crea una restricción ficticia y abre Ver / imprimir.
+- Comprueba Guardar como PDF desde el diálogo de impresión del navegador.
+- Abre Historial médico y archiva el reporte de prueba.
+- Confirma que ya no aparece en la lista principal, pero sí en el historial.
+- Archivar no borra el registro. La eliminación definitiva no se habilita para preservar trazabilidad y respetar políticas de retención.
+- La vista clínica detallada sigue limitada a Enfermería y Administración. Los líderes y supervisores usan el reporte operativo sin diagnóstico.
+
+D. Solicitudes de préstamo
+- Con un líder, registra un préstamo entre líneas con fechas y motivo.
+- Con Supervisor o Administrador, aprueba o rechaza la solicitud.
+- Después, registra devolución si está aprobada.
+- LIMITACIÓN IMPORTANTE: este módulo registra la solicitud y autorización, pero todavía NO inserta automáticamente al operador prestado en el generador ni lo devuelve automáticamente a la línea de origen. No uses el estado “Aprobado” como garantía de asignación. Esa integración requiere una fase posterior con validaciones de asistencia, autorización de estaciones, restricciones, ergonomía, cobertura de ambas líneas y conflictos entre préstamos.
+
+E. Interfaz
+- Comprueba en una ventana estrecha o emulación de tablet que los controles se puedan pulsar y las tablas se desplacen horizontalmente.
+- El sistema sigue siendo una aplicación web; no es una APK nativa.
+
+LIMITACIONES Y SEGURIDAD
+- Esta fase no incluye todavía pruebas integrales con Flask en todos los roles ni validación con usuarios reales. Ejecuta la lista de pruebas antes de avanzar.
+- No compartas credenciales ni subas reportes médicos reales a servicios externos.
+- El acceso del supervisor a diagnósticos médicos no se habilita en esta fase. Mantener la condición clínica limitada reduce exposición de datos sensibles; el supervisor ve las restricciones operativas necesarias para asignar el trabajo. Cualquier acceso clínico adicional debe aprobarse con las áreas responsables de la empresa y quedar auditado.
+- La base de datos SQLite actual se conserva. Antes de múltiples líneas y escrituras concurrentes, evaluar PostgreSQL y un servidor administrado por TI.

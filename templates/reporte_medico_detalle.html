@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block titulo %}Reporte médico de restricción{% endblock %}
+{% block contenido %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3 no-print">
+  <div><h1 class="h3">Reporte de restricción laboral</h1><p class="text-muted">Documento confidencial. Acceso restringido.</p></div>
+  <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar como PDF</button>
+</div>
+<section class="card shadow-sm report-paper"><div class="card-body">
+  <h2 class="h4">Reporte de restricción laboral</h2>
+  <p><strong>Folio:</strong> {{ reporte.id_restriccion }}</p>
+  <p><strong>Operador:</strong> {{ reporte.nombre }} ({{ reporte.numero_empleado }})</p>
+  <p><strong>Fecha de registro:</strong> {{ reporte.fecha_registro }}</p>
+  <p><strong>Vigencia:</strong> {{ reporte.fecha_inicio }} — {{ reporte.fecha_fin or 'Sin fecha de fin registrada' }}</p>
+  <p><strong>Estado:</strong> {{ reporte.estado }}</p><hr>
+  <h3 class="h5">Condición registrada</h3><p>{{ reporte.condicion or 'No especificada' }}</p>
+  <h3 class="h5">Observaciones</h3><p>{{ reporte.observaciones or 'Sin observaciones registradas' }}</p>
+  <h3 class="h5">Estaciones</h3>
+  <ul>{% for e in estaciones %}<li>{{ e.nombre_estacion }}: {{ 'Permitida' if e.permitida else 'No permitida' }}</li>{% else %}<li>No hay estaciones detalladas.</li>{% endfor %}</ul>
+  <p><strong>Registrado por:</strong> {{ reporte.registrado_por_nombre or 'No disponible' }}</p>
+  <p class="small text-muted">Información confidencial de salud laboral. Compartir únicamente con personas autorizadas conforme a las políticas de la empresa.</p>
+</div></section>
+<style>@media print {.no-print, nav, .navbar, .sidebar, footer, .btn {display:none!important} body{background:white!important}.report-paper{border:0!important;box-shadow:none!important}.card-body{padding:0!important}}</style>
+{% endblock %}

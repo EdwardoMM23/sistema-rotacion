@@ -1,0 +1,42 @@
+GUIA DE ACTUALIZACION - MEJORAS DEL 9 DE NOVIEMBRE
+
+IMPORTANTE: realiza esta actualización primero en una copia de pruebas y con autorización de la empresa.
+
+A. ANTES DE ACTUALIZAR
+1. Cierra las sesiones de los líderes y detén el servidor Flask/Waitress.
+2. Ubica la carpeta actual del proyecto.
+3. Copia toda la carpeta del proyecto como respaldo.
+4. Copia por separado el archivo instance/rotacion.db. Si existe rotacion_respaldo.db, conserva también esa copia.
+5. No elimines la base de datos ni limpies los registros de prueba sin autorización.
+
+B. COLOCAR LOS ARCHIVOS
+1. Extrae el ZIP de código en una carpeta nueva o reemplaza únicamente los archivos del proyecto.
+2. El ZIP no contiene .venv ni archivos .db; conserva tu entorno virtual y tu carpeta instance actual.
+3. Si usas el parche, copia los archivos del parche respetando sus carpetas.
+4. No reemplaces la base de datos por una vacía.
+
+C. PRIMER ARRANQUE Y MIGRACION
+1. Activa el entorno virtual que utiliza el proyecto.
+2. Instala dependencias si fuera necesario: python -m pip install -r requirements.txt
+3. Inicia el servidor como lo haces normalmente (run_server.py o el archivo BAT configurado).
+4. En el arranque, crear_base_datos() crea la relación estaciones_areas y normaliza los nombres antiguos.
+5. Si aparece un error, detén el servidor y restaura la copia de instance/rotacion.db. No intentes borrar tablas para corregirlo.
+
+D. PRUEBAS RECOMENDADAS
+1. Entra a Puestos por línea y selecciona una línea de Producción. Deben aparecer exactamente 11 estaciones de Producción.
+2. Selecciona una línea MFI. Deben aparecer exactamente 12 estaciones MFI.
+3. Cambia el área de una línea de prueba. Guarda el cambio; al recargar, verifica que cambió el catálogo. Captura cantidades y guarda nuevamente.
+4. Genera una propuesta de Producción y verifica que no incluya Breakout, Inserción, Test A ni Empaque 1/2.
+5. Genera una propuesta MFI y verifica que no incluya Accesorios, Anel, Decapado, IL/RL, Brady ni Amarre.
+6. En Préstamos, busca un operador por número y por nombre.
+7. En Intercambio, selecciona un periodo con operadores presentes. Comprueba que aparezcan los operadores disponibles que no están asignados en otro periodo/línea.
+8. Sustituye una asignación con un operador de apoyo de pruebas. Confirma que el historial registre el cambio y que el operador anterior quede sin esa asignación.
+9. Comprueba que un operador con préstamo vigente hacia otra línea no aparezca como disponible en su línea de origen.
+10. Comprueba que un operador prestado y asignado en la línea receptora aparezca entre las asignaciones para poder intercambiar su estación con otra persona del mismo periodo.
+11. Verifica que un cambio no permita asignar estaciones sin autorización ni ignore restricciones médicas.
+
+E. REGLAS IMPORTANTES
+- La sustitución no devuelve automáticamente un préstamo. Para finalizarlo, utiliza Registrar devolución en Préstamos.
+- Un operador prestado que ya esté asignado en el periodo de la línea receptora se intercambia desde la opción de segunda asignación; no debe aparecer además como operador disponible.
+- Si el operador disponible no confirmó asistencia, no tiene autorización para la estación, está asignado en otro periodo o tiene préstamo vigente a otra línea, el sistema debe rechazarlo/no mostrarlo.
+- Antes de usar en producción, valida las reglas con el supervisor y prueba con datos de capacitación.

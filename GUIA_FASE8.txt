@@ -1,0 +1,51 @@
+FASE 8 — INTEGRACIÓN DE BÚSQUEDAS, AVISOS, LÍNEAS, PRÉSTAMOS Y DOS TURNOS
+
+IMPORTANTE
+- Esta actualización modifica código y realiza migraciones aditivas en SQLite.
+- Haz copia completa del proyecto y copia de instance/rotacion.db antes de instalar.
+- No reemplaces la base de datos por una incluida en otro ZIP; este parche no contiene base de datos ni venv.
+- La generación de rotaciones sigue siendo una propuesta que debe revisar el responsable antes de uso operativo.
+
+QUÉ INCLUYE
+1. Integra los avisos operativos de restricciones de la fase anterior en Inicio; los avisos no muestran diagnóstico médico.
+2. Añade búsquedas por número de empleado, nombre o apellido en operadores y restricciones, y filtro visual de asistencia.
+3. Añade el selector Matutino/Vespertino en rotaciones y asistencia.
+4. Asigna a cada operador un turno (por defecto los operadores existentes se migran como Matutino para no cambiar su clasificación sin autorización). Los nuevos operadores permiten elegir turno.
+5. Configura los periodos:
+   Matutino: 06:00–09:00, 09:00–12:00, 12:00–15:12.
+   Vespertino: 15:30–18:30, 18:30–21:30, 21:30–00:30.
+6. Añade la tabla de solicitudes de préstamo entre líneas, con aprobación, rechazo y registro de devolución. El préstamo todavía NO se incorpora automáticamente al algoritmo de rotación.
+7. Añade navegación al historial médico y a préstamos; conserva el archivado de reportes en lugar de borrado físico.
+8. Añade columnas de estado laboral y archivado mediante migración no destructiva.
+
+INSTALACIÓN
+1. Detén Flask con Ctrl+C.
+2. Copia toda la carpeta del proyecto a una ubicación de respaldo y respalda instance/rotacion.db.
+3. Extrae el ZIP en una carpeta temporal.
+4. Copia app.py, database.py y generador.py a la raíz del proyecto, reemplazando los existentes.
+5. Copia los archivos de templates/ a la carpeta templates/ existente, conservando los demás archivos.
+6. Copia verificar_fase8.py y GUIA_FASE8.txt a la raíz.
+7. No copies un venv de otra computadora. No borres instance/rotacion.db.
+8. Con el entorno virtual del proyecto activo, ejecuta:
+   python -m py_compile app.py database.py algoritmo.py generador.py
+   python probar_reglas.py
+   python verificar_fase8.py
+9. Arranca la app con python app.py.
+
+PRUEBAS MANUALES
+A. Operadores: crea operadores ficticios en ambas opciones de turno; comprueba que el filtro por turno funciona.
+B. Asistencia: selecciona línea, fecha y turno; marca asistencia de operadores de ese turno; guarda y vuelve a consultar.
+C. Rotaciones: configura puestos y autorizaciones; registra presentes en cada turno; genera propuesta Matutino y Vespertino por separado. Confirma que las horas son correctas y no aparecen operadores del otro turno.
+D. Duplicados: genera una propuesta una vez; vuelve a intentar para la misma línea, fecha y turno. Debe impedir el duplicado. El otro turno debe poder generarse sin colisionar.
+E. Búsquedas: prueba número de empleado, parte del nombre y apellido.
+F. Restricciones: comprueba que el líder vea solamente la información operativa y que la condición clínica siga restringida a Enfermería/Administración.
+G. Préstamos: registra una solicitud, apruébala/recházala y registra devolución. No uses un préstamo aprobado para rotación automática todavía.
+H. Historial y reportes: abre e imprime un reporte de prueba y archívalo; comprueba que siga en historial.
+
+LIMITACIONES IMPORTANTES
+- Las cuentas de operadores existentes quedan asignadas a Matutino por defecto. Antes de utilizar Vespertino, revisa y cambia el turno de los operadores correspondientes. Se incluye una acción para que Supervisor/Administrador pueda cambiar el turno de un operador existente. El sistema bloquea el cambio si hay asignaciones guardadas desde la fecha actual; revisa o cancela primero esas rotaciones.
+- La base de datos conserva la restricción única antigua de rotación. Para evitar colisiones entre turnos, Matutino guarda números internos 1–3 y Vespertino 4–6; la pantalla utiliza los horarios para distinguir periodos. No cambies esos números manualmente.
+- La asistencia se registra por operador y fecha, no por turno. Se presupone que cada operador pertenece a un solo turno en una fecha. Si se requiere que una persona trabaje doble turno, habrá que migrar el modelo de asistencia.
+- El sistema de préstamos registra solicitudes y estados, pero no transfiere automáticamente al operador a la línea destino ni comprueba aún la cobertura simultánea de ambas líneas dentro del algoritmo.
+- El turno Vespertino cruza medianoche. La fecha que se selecciona es la fecha de inicio del turno; el tercer periodo termina a las 00:30 del día siguiente.
+- La validación hecha en el entorno de desarrollo cubrió sintaxis Python, reglas del algoritmo y migración de esquema sobre una copia de la base de datos. No sustituye pruebas integrales en el navegador ni autorización de TI.

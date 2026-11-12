@@ -1,0 +1,86 @@
+GUÍA DE DESPLIEGUE DEL SISTEMA DE ROTACIONES (Windows + Flask + Waitress)
+Versión de trabajo: 4NOV corregida. Leer antes de instalar.
+
+IMPORTANTE
+- No se puede prometer un despliegue "al 100%" sin validación del departamento de TI y pruebas en la red real.
+- Las tabletas y computadoras cliente solo necesitan navegador y acceso a la red autorizada.
+- Python/Waitress se ejecutan únicamente en el equipo servidor.
+- No expongas el puerto del sistema a Internet. Usa red interna/VPN aprobada por TI.
+- Antes de tocar datos reales, respalda instance/rotacion.db y prueba restaurar una copia.
+
+A. PREPARACIÓN
+1. Solicita a TI un equipo servidor o PC autorizado que permanezca encendido.
+2. Solicita IP fija/reservada o nombre DNS, acceso de red para las tabletas y autorización del firewall.
+3. Define responsable técnico, cuentas, permisos, política de respaldo y quién atenderá fallas.
+4. Copia el proyecto a C:\SistemaRotaciones. No copies la carpeta .venv del ZIP.
+5. Mantén una copia de seguridad del proyecto original.
+
+B. INSTALACIÓN EN EL SERVIDOR
+1. Instala una versión de Python compatible con requirements.txt, solo en el servidor.
+2. Abre PowerShell:
+   cd C:\SistemaRotaciones
+   py -m venv venv
+   .\venv\Scripts\Activate.ps1
+   python -m pip install --upgrade pip
+   pip install -r requirements.txt
+3. Inicializa/actualiza el esquema sin borrar información:
+   python crear_tablas.py
+4. Respalda la base de datos antes de crear/activar las líneas:
+   crea una copia de instance\rotacion.db con el servidor detenido.
+5. Ejecuta:
+   python configurar_lineas_produccion.py
+   Este script crea/activa Línea 1..Línea 10 y MFI1..MFI4. No borra operadores ni rotaciones.
+6. En la aplicación, revisa Puestos por línea y configura las estaciones/dotaciones requeridas para cada línea y periodo. No se asume que todas las estaciones se usan en todas las líneas MFI.
+7. Revisa/crea la cuenta Administrador con contraseña segura. Crea las demás cuentas y asigna roles y líneas.
+
+C. CONFIGURAR SERVIDOR
+1. Revisa run_server.py. Debe iniciar Waitress escuchando en la interfaz de red aprobada (no solo 127.0.0.1).
+2. No uses el servidor de desarrollo Flask para producción.
+3. Crea/valida iniciar_servidor.bat para activar venv y ejecutar run_server.py.
+4. Prueba primero desde el mismo servidor con http://127.0.0.1:PUERTO.
+5. Después prueba desde una computadora cliente con http://IP_O_NOMBRE_SERVIDOR:PUERTO.
+6. Autoriza en firewall únicamente el perfil/red privada y los equipos/subredes necesarios, con TI.
+7. Para uso permanente, pide a TI configurar el arranque como tarea programada o servicio Windows con una cuenta de servicio sin privilegios innecesarios. No dependas de que una persona abra VS Code.
+
+D. ACCESO DESDE TABLETAS Y COMPUTADORAS
+1. Conecta el dispositivo a la red Wi-Fi/LAN autorizada.
+2. Abre Chrome/Edge/Safari.
+3. Escribe la dirección del servidor aprobada por TI.
+4. Inicia sesión con cuenta individual. No compartas contraseñas.
+5. Opcional: agrega la página a favoritos o a pantalla de inicio.
+6. Verifica que los permisos impidan que cada líder modifique líneas ajenas.
+
+E. LIMPIEZA DE DATOS DE PRUEBA / ARRANQUE OFICIAL
+NO borres rotacion.db a ciegas. NO ejecutes DELETE FROM en todas las tablas.
+1. Detén el servidor y crea dos respaldos de instance\rotacion.db.
+2. Conserva un respaldo etiquetado "antes_lanzamiento".
+3. Decide con Administración/TI qué datos de prueba deben eliminarse y cuáles se conservarán como catálogo.
+4. Usa un procedimiento de limpieza diseñado para el esquema exacto y con claves foráneas. Debe eliminar en orden correcto operadores de prueba, asistencias, asignaciones/rotaciones, préstamos, restricciones de prueba, eventos y certificaciones ficticias.
+5. Conserva usuarios aprobados, catálogo de estaciones, las 10 líneas de Producción, las 4 MFI, puestos/demandas aprobadas y configuración.
+6. Crea cuentas oficiales y registra operadores reales desde fuentes autorizadas.
+7. Valida que no queden empleados ficticios, restricciones ficticias ni rotaciones de prueba.
+8. Prueba restaurar el respaldo en una copia antes de borrar cualquier dato. No hagas limpieza en la base de datos real hasta tener aprobación escrita.
+
+F. PRUEBAS DE ACEPTACIÓN
+- Acceso simultáneo desde dos tabletas y una PC.
+- Cada líder solo ve/modifica el ámbito autorizado.
+- Producción: grupos 1-2, 3-4, 5-6, 7-8 y 9-10, sin mezclar otros grupos.
+- MFI: selección de líneas y demandas configuradas por periodo.
+- Asistencia, habilidades, autorizaciones y restricciones activas.
+- Movimientos, intercambios, préstamos, ausencias y reincorporaciones.
+- Alertas de restricciones: por vencer, vence hoy y vencida desde el día siguiente.
+- Impresión completa en horizontal y guardado PDF.
+- Respaldo automático y restauración probada.
+
+G. RESPALDOS Y MANTENIMIENTO
+- Programa respaldo diario de instance\rotacion.db con el servidor detenido o mediante SQLite Backup API.
+- Conserva varias generaciones en ubicación aprobada y otra copia protegida.
+- No copies una base SQLite mientras se está escribiendo usando un método no seguro.
+- Registra fecha, responsable y resultado de cada respaldo.
+- TI debe monitorear espacio, disponibilidad, actualizaciones y eventos de Windows.
+- Actualiza la aplicación primero en una copia de pruebas; después de aprobar, despliega con respaldo y ventana de mantenimiento.
+
+H. QUÉ SIGNIFICA "SIN PYTHON NI VS CODE EN TABLETAS"
+Python/Waitress permanecen en el servidor. En tabletas y PCs cliente solo se usa el navegador. Si TI exige no instalar Python ni en el servidor, será necesario empaquetar o migrar el backend a una plataforma aprobada; no se resuelve instalando un ejecutable en cada tableta.
+
+Esta guía describe el procedimiento. La instalación real, firewall, servicio Windows, limpieza y aceptación deben ejecutarse con TI y responsables de cada área.

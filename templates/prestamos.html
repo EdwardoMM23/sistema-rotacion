@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block titulo %}Préstamos de operadores{% endblock %}
+{% block contenido %}
+<h1 class="h3 mb-3">Préstamos de operadores entre líneas</h1>
+<p class="text-muted">Las solicitudes deben aprobarse antes de utilizar al operador en otra línea. Los préstamos aprobados y vigentes se consideran al generar y modificar las rotaciones, siempre que se validen asistencia, autorización y restricciones.</p>
+<form method="post" class="card card-body mb-4">
+ <h2 class="h5">Nueva solicitud</h2>
+ <label class="form-label" for="buscar_operador_prestamo">Buscar operador por número o nombre</label>
+ <input class="form-control mb-2" type="search" id="buscar_operador_prestamo" placeholder="Ej. 250084 o nombre del operador" autocomplete="off">
+ <label class="form-label" for="id_operador">Operador que se prestará</label>
+ <select class="form-select mb-3" name="id_operador" id="id_operador" required><option value="">Selecciona operador</option>{% for o in operadores %}<option value="{{o.id_operador}}">{{o.numero_empleado}} — {{o.nombre}} · {{o.nombre_linea}}</option>{% endfor %}</select>
+ <label class="form-label" for="id_linea_destino">Línea destino</label>
+ <select class="form-select mb-3" name="id_linea_destino" id="id_linea_destino" required><option value="">Selecciona línea</option>{% for l in lineas %}<option value="{{l.id_linea}}">{{l.nombre_linea}}</option>{% endfor %}</select>
+ <div class="row g-3"><div class="col-md-6"><label class="form-label">Fecha de inicio</label><input class="form-control" type="date" name="fecha_inicio" required></div><div class="col-md-6"><label class="form-label">Fecha de fin (opcional)</label><input class="form-control" type="date" name="fecha_fin"></div><div class="col-md-6"><label class="form-label">Hora de inicio (opcional)</label><input class="form-control" type="time" name="hora_inicio"></div><div class="col-md-6"><label class="form-label">Hora de finalización (opcional)</label><input class="form-control" type="time" name="hora_fin"></div></div>
+ <div class="form-text mb-3">Si capturas ambas horas, el préstamo aplica al intervalo indicado. Si dejas ambas vacías, aplica al día completo. La devolución anticipada se registra con la hora real.</div>
+ <label class="form-label mt-3">Motivo operativo</label><textarea class="form-control mb-3" name="motivo" rows="2" required></textarea>
+ <button class="btn btn-primary" type="submit">Registrar solicitud</button>
+</form>
+<div class="table-responsive"><table class="table table-striped align-middle"><thead><tr><th>Operador</th><th>Origen</th><th>Destino</th><th>Fechas y horas</th><th>Motivo</th><th>Estado</th><th>Acción</th></tr></thead><tbody>
+{% for p in prestamos %}<tr><td>{{p.numero_empleado}} — {{p.nombre}}</td><td>{{p.linea_origen}}</td><td>{{p.linea_destino}}</td><td>{{p.fecha_inicio}} – {{p.fecha_fin or 'Sin fecha final'}}<br>{{p.hora_inicio or 'Día completo'}}{% if p.hora_fin %}–{{p.hora_fin}}{% endif %}{% if p.hora_devolucion %}<br>Devuelto: {{p.hora_devolucion}}{% if p.devolucion_anticipada %} (anticipada){% endif %}{% endif %}</td><td>{{p.motivo}}</td><td>{{p.estado}}</td><td>{% if session.get('rol') in ['Supervisor','Administrador'] %}<form method="post" action="{{url_for('accion_prestamo',id_prestamo=p.id_prestamo)}}" class="d-flex flex-wrap gap-1">{% if p.estado == 'Pendiente' %}<button name="accion" value="aprobar" class="btn btn-sm btn-success">Aprobar</button><button name="accion" value="rechazar" class="btn btn-sm btn-outline-danger">Rechazar</button>{% elif p.estado == 'Aprobado' %}<button name="accion" value="devolver" class="btn btn-sm btn-secondary">Registrar devolución</button>{% endif %}</form>{% endif %}</td></tr>{% else %}<tr><td colspan="7" class="text-center text-muted">No hay solicitudes registradas.</td></tr>{% endfor %}
+</tbody></table></div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+ const buscador = document.getElementById('buscar_operador_prestamo');
+ const selector = document.getElementById('id_operador');
+ if (!buscador || !selector) return;
+ const opciones = Array.from(selector.options).slice(1);
+ buscador.addEventListener('input', () => {
+   const q = buscador.value.trim().toLocaleLowerCase();
+   opciones.forEach(op => { op.hidden = q !== '' && !op.textContent.toLocaleLowerCase().includes(q); });
+   if (selector.selectedOptions[0]?.hidden) selector.value = '';
+ });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,61 @@
+FASE 5 — REPORTES, ACCESOS Y OPERACIÓN EN TABLETS
+=================================================
+
+Esta entrega incluye el primer cambio funcional de esta fase:
+- El reporte detallado de una restricción ya guardada puede consultarse e imprimirse/guardarse como PDF desde el navegador.
+- El reporte detallado incluye condición/observaciones y estaciones permitidas/no permitidas.
+- La ruta está restringida a Enfermería y Administración. El reporte operativo separado para Líder/Supervisor continúa sin mostrar diagnóstico ni observaciones clínicas.
+
+INSTALACIÓN
+-----------
+1. Detén Flask (Ctrl+C).
+2. Haz una copia completa de tu proyecto y de instance/rotacion.db.
+3. Extrae este paquete.
+4. Copia app.py encima del actual y copia la carpeta templates/reporte_medico_detalle.html.
+5. Reemplaza templates/restricciones.html con el archivo incluido.
+6. Ejecuta:
+   python -m py_compile app.py
+7. Inicia con tu entorno virtual y prueba con una cuenta de Enfermería/Administrador.
+8. Abre Restricciones, pulsa "Ver / Imprimir" y elige "Guardar como PDF" en el diálogo de impresión.
+No se elimina ni recrea la base de datos.
+
+IMPORTANTE SOBRE INFORMACIÓN MÉDICA
+-----------------------------------
+La condición/diagnóstico médico es información sensible. Aunque el supervisor necesita conocer y aplicar las restricciones laborales, no se debe habilitar automáticamente el diagnóstico exacto para todos los supervisores. Antes de ampliar ese acceso, pide al asesor y al área responsable de privacidad/RH/TI que definan por escrito quién puede consultar la condición, con qué propósito y qué datos mínimos necesita. La configuración incluida mantiene el reporte clínico detallado limitado a Enfermería/Administración; el supervisor puede consultar el reporte operativo (vigencias y estaciones no permitidas). Esto evita exponer datos de salud de forma innecesaria.
+
+PLAN RESTANTE DE LA FASE 5 (NO IMPLEMENTADO TODAVÍA)
+---------------------------------------------------
+A. Historial de reportes médicos:
+   - Lista por operador, fecha, estado y folio.
+   - Abrir, imprimir y guardar como PDF.
+   - En vez de borrar físicamente, preferir "archivar/finalizar" con usuario, fecha y motivo; mantener trazabilidad de quién cambió el registro. La eliminación definitiva solo debería existir si la política de retención de la empresa la autoriza.
+B. Estado operativo del operador:
+   - Sustituir el único interruptor activo/inactivo por estados separados: Activo, Vacaciones, Incapacidad, Permiso por horas, Baja.
+   - Guardar fechas de inicio/fin, motivo operativo no clínico y quién hizo el cambio.
+   - Los operadores con vacaciones/incapacidad/baja no deben asignarse automáticamente. Permisos por horas requieren una regla de disponibilidad por intervalo.
+   - No borrar operadores históricos: dar de baja conservando asignaciones pasadas.
+C. Registro de cuentas:
+   - Agregar "Crear cuenta" en login, pero nunca permitir que cualquiera se autoasigne directamente el rol Administrador, Supervisor o Enfermería.
+   - Flujo seguro: formulario con nombre, usuario, contraseña y rol solicitado; cuenta queda "Pendiente de aprobación" y no puede iniciar sesión hasta que un Administrador la apruebe y asigne el rol definitivo.
+   - Contraseña mínima de 10 caracteres, confirmación y botón mostrar/ocultar contraseña.
+   - Nunca guardar contraseñas en texto plano; conservar hash.
+D. Operadores prestados entre líneas:
+   - Solicitud de préstamo con línea origen/destino, operador, intervalo, motivo y estado.
+   - Validar autorización de estaciones, restricciones vigentes, postura y reglas de secuencia.
+   - Aceptación por líder receptor y autorización de supervisor cuando corresponda.
+   - Registrar devolución a línea de origen y cada decisión en el historial.
+E. Pruebas para tablets:
+   - Interfaz adaptable, sesiones seguras, permisos por rol y línea.
+   - Pruebas simultáneas con datos ficticios; respaldo y recuperación.
+   - Instalación como servicio en equipo autorizado; no depender de VS Code abierto.
+
+ORDEN RECOMENDADO
+-----------------
+1. Validar este reporte impreso.
+2. Construir historial de reportes y finalización/archivo.
+3. Añadir estados de operador y conectar dichos estados con asistencia/rotaciones.
+4. Implementar registro de cuenta pendiente de aprobación y mostrar/ocultar contraseña.
+5. Implementar préstamos de operadores.
+6. Adaptar y probar las pantallas en tablets y preparar el despliegue.
+
+Esta entrega es una actualización de desarrollo, no una declaración de que el sistema esté listo para producción. Prueba primero con datos ficticios y solicita revisión de TI antes de utilizar información real.

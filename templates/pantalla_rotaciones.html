@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pantalla de rotaciones</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root { --morado:#702963; --rosa:#f1d9ee; --verde:#b9e6c9; }
+    body { background:#f7f5f8; color:#211c22; }
+    .topbar { background:var(--morado); color:white; padding:1rem; }
+    .board-title { font-size:clamp(1.5rem,3vw,2.5rem); font-weight:800; }
+    .station-card { border:2px solid #ddd; border-radius:.8rem; overflow:hidden; height:100%; background:white; }
+    .station-head { padding:.65rem .8rem; font-weight:800; font-size:clamp(1rem,1.5vw,1.35rem); }
+    .station-head.sitting { background:var(--rosa); }
+    .station-head.standing { background:var(--verde); }
+    .operator { padding:.55rem .8rem; border-top:1px solid #eee; font-size:clamp(.95rem,1.2vw,1.15rem); }
+    .meta { color:#5e5660; }
+    .btn, .form-control, .form-select { min-height:44px; }
+    @media print {
+      @page { size: landscape; margin: 10mm; }
+      body { background:white !important; font-size:10pt; }
+      .no-print { display:none !important; }
+      .topbar { background:white !important; color:#111 !important; padding:0 0 .5rem; border-bottom:2px solid #702963; }
+      .station-card { break-inside:avoid; border:1px solid #777; }
+      .station-head { print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+      .operator { padding:.3rem .5rem; }
+      .period-block { break-inside:avoid; }
+      .container-fluid { padding:0 !important; }
+    }
+  </style>
+  {% if auto_actualizar %}<meta http-equiv="refresh" content="60">{% endif %}
+</head>
+<body>
+<header class="topbar">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <div>
+      <div class="board-title">Rotación de operadores</div>
+      <div class="fs-5">{{ nombre_linea or 'Selecciona una línea' }} · {{ fecha }} · Turno {{ turno }}</div>
+    </div>
+    <div class="no-print d-flex flex-wrap gap-2">
+      <button class="btn btn-light fw-bold" onclick="window.print()">Imprimir / Guardar PDF</button>
+      <a class="btn btn-outline-light" href="{{ url_for('rotaciones') }}?fecha={{ fecha }}{% if id_linea %}&id_linea={{ id_linea }}{% endif %}&turno={{ turno|urlencode }}">Editar rotación</a>
+      <a class="btn btn-outline-light" href="{{ url_for('pantalla_rotaciones', fecha=fecha, id_linea=id_linea, turno=turno, auto=1 if not auto_actualizar else 0) }}">{% if auto_actualizar %}Desactivar actualización{% else %}Actualizar cada minuto{% endif %}</a>
+    </div>
+  </div>
+</header>
+<main class="container-fluid p-3 p-lg-4">
+  <form method="get" class="row g-2 align-items-end no-print mb-4">
+    <div class="col-12 col-md-4"><label class="form-label fw-bold" for="id_linea">Línea</label>
+      <select class="form-select" name="id_linea" id="id_linea" required>
+        <option value="">Seleccionar línea...</option>
+        {% for linea in lineas %}<option value="{{ linea.id_linea }}" {% if id_linea == linea.id_linea %}selected{% endif %}>{{ linea.nombre_linea }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-md-3"><label class="form-label fw-bold" for="fecha">Fecha</label><input class="form-control" type="date" id="fecha" name="fecha" value="{{ fecha }}" required></div>
+    <div class="col-6 col-md-2"><label class="form-label fw-bold" for="turno">Turno</label><select class="form-select" id="turno" name="turno"><option {% if turno=='Matutino' %}selected{% endif %}>Matutino</option><option {% if turno=='Vespertino' %}selected{% endif %}>Vespertino</option></select></div>
+    {% if auto_actualizar %}<input type="hidden" name="auto" value="1">{% endif %}
+    <div class="col-12 col-md-3"><button class="btn btn-dark w-100 fw-bold" type="submit">Ver rotación</button></div>
+  </form>
+  <div class="d-flex flex-wrap gap-3 align-items-center mb-3">
+    <span><span class="d-inline-block rounded me-1" style="width:18px;height:18px;background:var(--rosa);vertical-align:middle"></span> Estación sentada</span>
+    <span><span class="d-inline-block rounded me-1" style="width:18px;height:18px;background:var(--verde);vertical-align:middle"></span> Estación de pie</span>
+    <span class="meta">Vista de consulta: no permite editar asignaciones.</span>
+  </div>
+  {% if not id_linea %}
+    <div class="alert alert-info fs-5">Selecciona la línea y la fecha para mostrar la rotación vigente en esta computadora o pantalla.</div>
+  {% elif not registros %}
+    <div class="alert alert-warning fs-5">No hay una rotación guardada para esta línea, fecha y turno. La líder debe generar y guardar una propuesta.</div>
+  {% else %}
+    {% for registro in registros %}
+      <section class="period-block mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-2">
+          <h2 class="h4 mb-0">Periodo {{ loop.index }} · {{ registro.hora_inicio or '' }}</h2>
+          <span class="badge text-bg-secondary">{{ registro.estado }}</span>
+        </div>
+        {% if registro.asignaciones %}
+          <div class="row g-3">
+            {% for asignacion in registro.asignaciones %}
+              <div class="col-12 col-sm-6 col-lg-4 col-xxl-3">
+                <article class="station-card">
+                  <div class="station-head {% if asignacion.postura and ('pie' in asignacion.postura|lower or 'parado' in asignacion.postura|lower) %}standing{% else %}sitting{% endif %}">{{ asignacion.nombre_estacion }}</div>
+                  <div class="operator"><strong>{{ asignacion.nombre }}</strong><div class="meta">N.º {{ asignacion.numero_empleado }}</div>
+                    {% if asignacion.es_prestado %}<span class="badge text-bg-info mt-1">Apoyo / préstamo</span>{% endif %}
+                  </div>
+                </article>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}<p class="text-muted">No hay asignaciones registradas en este periodo.</p>{% endif %}
+      </section>
+    {% endfor %}
+    <p class="meta small">Imprime esta vista o selecciona “Imprimir / Guardar PDF” y elige “Guardar como PDF” en el cuadro de impresión del navegador.</p>
+  {% endif %}
+</main>
+{% if auto_actualizar %}
+<script>
+  // Recarga de solo lectura cada 60 segundos para reflejar cambios hechos desde tabletas/PC.
+  // La sesión debe seguir activa; la vista nunca permite editar.
+  window.setTimeout(function () { window.location.reload(); }, 60000);
+</script>
+{% endif %}
+</body>
+</html>

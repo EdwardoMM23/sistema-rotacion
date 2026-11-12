@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block titulo %}Edición flexible de rotaciones{% endblock %}
+{% block contenido %}
+<style>
+.editor-head{background:#702963;color:#fff;border-radius:.8rem;padding:1rem}.station-chip{background:#f3e6f2;border:1px solid #dec4dc;border-radius:.65rem;padding:.75rem;height:100%}.station-chip.standing{background:#dff3e5;border-color:#b5dec2}.touch-link{min-height:44px;display:inline-flex;align-items:center}
+@media print{.no-print{display:none!important}}
+</style>
+<div class="editor-head mb-3">
+  <h1 class="h3 mb-1">Edición flexible de rotaciones</h1>
+  <p class="mb-0">Mueve operadores, intercambia estaciones y revisa la propuesta antes de confirmarla.</p>
+</div>
+<form method="get" class="card card-body mb-3 no-print">
+ <div class="row g-2 align-items-end">
+  <div class="col-12 col-md-4"><label class="form-label" for="id_linea">Línea</label><select class="form-select" id="id_linea" name="id_linea" required><option value="">Seleccionar...</option>{% for l in lineas %}<option value="{{l.id_linea}}" {% if id_linea==l.id_linea %}selected{% endif %}>{{l.nombre_linea}}</option>{% endfor %}</select></div>
+  <div class="col-6 col-md-3"><label class="form-label" for="fecha">Fecha</label><input class="form-control" id="fecha" type="date" name="fecha" value="{{fecha}}" required></div>
+  <div class="col-6 col-md-2"><label class="form-label" for="turno">Turno</label><select class="form-select" id="turno" name="turno"><option value="Matutino" {% if turno=='Matutino' %}selected{% endif %}>Matutino</option><option value="Vespertino" {% if turno=='Vespertino' %}selected{% endif %}>Vespertino</option></select></div>
+  <div class="col-12 col-md-3"><button class="btn btn-primary w-100 touch-link">Consultar</button></div>
+ </div>
+</form>
+{% if id_linea %}
+<div class="d-flex flex-wrap gap-2 mb-3 no-print">
+ <a class="btn btn-outline-primary touch-link" href="{{url_for('rotaciones',id_linea=id_linea,fecha=fecha,turno=turno)}}">Ver tabla de rotación</a>
+ <a class="btn btn-outline-secondary touch-link" href="{{url_for('versiones_rotaciones',id_linea=id_linea,fecha=fecha,turno=turno)}}">Consultar versiones anteriores</a>
+ <a class="btn btn-outline-dark touch-link" href="{{url_for('intercambio_simultaneo',id_rotacion=registros[0].id_rotacion)}}" {% if not registros %}aria-disabled="true"{% endif %}>Intercambiar operadores</a>
+ <button class="btn btn-outline-secondary touch-link" onclick="window.print()" type="button">Imprimir</button>
+</div>
+<h2 class="h4">{{nombre_linea}} · {{fecha}} · {{turno}}</h2>
+{% if registros %}
+ <div class="alert alert-info">Los cambios se guardan por asignación. Para un intercambio de dos personas usa “Intercambiar operadores”, que valida ambas asignaciones en conjunto. La habilidad orienta la propuesta automática, pero no es una regla obligatoria.</div>
+ {% for r in registros %}
+ <section class="card mb-4">
+  <div class="card-header d-flex flex-wrap justify-content-between gap-2 align-items-center"><strong>Periodo {{loop.index}} · {{r.hora_inicio}}</strong><span class="badge text-bg-{% if r.estado=='Modificada' %}warning{% elif r.estado=='Validada' %}success{% else %}secondary{% endif %}">{{r.estado}}</span><a class="btn btn-sm btn-outline-primary no-print" href="{{url_for('intercambio_simultaneo',id_rotacion=r.id_rotacion)}}">Intercambiar en este periodo</a></div>
+  <div class="card-body"><div class="row g-2">
+   {% for a in r.asignaciones %}
+   <div class="col-12 col-sm-6 col-xl-4"><div class="station-chip {% if a.postura and ('pie' in a.postura|lower or 'parado' in a.postura|lower or 'standing' in a.postura|lower) %}standing{% endif %}">
+    <div class="fw-bold">{{a.nombre_estacion}}</div><div>{{a.nombre}}</div><small class="text-muted">Empleado {{a.numero_empleado}} · {{a.hora_inicio}}–{{a.hora_fin}}</small>
+    <div class="mt-2 no-print"><a class="btn btn-sm btn-outline-primary touch-link" href="{{url_for('editar_asignacion',id_asignacion=a.id_asignacion)}}">Mover de estación</a></div>
+   </div></div>
+   {% endfor %}
+  </div></div>
+ </section>
+ {% endfor %}
+{% else %}<div class="alert alert-warning">No hay una propuesta activa para esta línea, fecha y turno. Genera primero una propuesta desde la tabla de rotaciones.</div>{% endif %}
+{% else %}<div class="alert alert-secondary">Selecciona una línea para editar su rotación.</div>{% endif %}
+{% endblock %}

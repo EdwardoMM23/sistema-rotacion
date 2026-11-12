@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% block titulo %}Rotaciones{% endblock %}
+{% block contenido %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <div>
+    <h1 class="h3">Rotaciones de personal</h1>
+    <p class="text-muted mb-0">Consulta y revisa la distribución antes de guardarla.</p>
+  </div>
+  {% if session.get('rol') in ['Lider','Supervisor','Administrador'] %}
+    <div class="d-flex flex-wrap gap-2">
+      <a class="btn btn-outline-primary" href="{{url_for('configuracion_puestos')}}">Configurar puestos</a>
+      <a class="btn btn-outline-primary" href="{{url_for('habilidades_estacion')}}">Registrar habilidades</a>
+      <a class="btn btn-outline-primary" href="{{url_for('editor_rotaciones',fecha=fecha,id_linea=id_linea,turno=turno)}}">Edición flexible</a>
+    </div>
+  {% endif %}
+</div>
+
+<form method="get" class="card card-body mb-3">
+  <div class="row g-2">
+    <div class="col-md-3">
+      <label class="form-label">Fecha</label>
+      <input type="date" name="fecha" value="{{fecha}}" class="form-control" required>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Turno</label>
+      <select name="turno" class="form-select" required>
+        <option value="Matutino" {% if turno == 'Matutino' %}selected{% endif %}>Matutino (06:00–15:12)</option>
+        <option value="Vespertino" {% if turno == 'Vespertino' %}selected{% endif %}>Vespertino (15:30–00:30)</option>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Línea</label>
+      <select name="id_linea" class="form-select" required>
+        <option value="">Selecciona</option>
+        {% for l in lineas %}
+          <option value="{{l.id_linea}}" {% if id_linea == l.id_linea %}selected{% endif %}>{{l.nombre_linea}}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+      <button class="btn btn-primary w-100">Consultar</button>
+    </div>
+  </div>
+</form>
+
+{% if id_linea and session.get('rol') in ['Lider','Supervisor','Administrador'] %}
+<form method="post" action="{{url_for('generar_rotaciones')}}" class="mb-3">
+  <input type="hidden" name="fecha" value="{{fecha}}">
+  <input type="hidden" name="id_linea" value="{{id_linea}}">
+  <input type="hidden" name="turno" value="{{turno}}">
+  <div class="form-check mb-2">
+    <input class="form-check-input" type="checkbox" id="usar_habilidades" name="usar_habilidades" checked>
+    <label class="form-check-label" for="usar_habilidades">Tomar en cuenta las habilidades registradas (solo como preferencia)</label>
+  </div>
+  <button class="btn btn-success" onclick="return confirm('Generar y guardar propuesta para esta fecha?')">
+    Generar propuesta de {{ periodos|length }} periodos · {{ turno }}
+  </button>
+</form>
+<form method="post" action="{{url_for('generar_rotaciones_grupo')}}" class="card card-body mb-3 border-primary">
+  <input type="hidden" name="fecha" value="{{fecha}}"><input type="hidden" name="id_linea" value="{{id_linea}}"><input type="hidden" name="turno" value="{{turno}}">
+  <div class="fw-semibold mb-1">Generación grupal: selecciona las líneas que deseas procesar</div>
+  <p class="small text-muted mb-2">Producción: solo puedes combinar las dos líneas de la pareja correspondiente (1–2, 3–4, 5–6, 7–8 o 9–10). MFI: puedes seleccionar las líneas MFI que trabajarán juntas. Las demás líneas no se modifican.</p>
+  <div class="row row-cols-2 row-cols-md-4 g-2 mb-3">
+    {% for l in lineas %}{% if l.id_linea in grupo_sugerido %}
+    <div class="col"><label class="form-check border rounded p-2 h-100"><input class="form-check-input ms-0 me-2" type="checkbox" name="lineas_grupo" value="{{l.id_linea}}" checked><span class="form-check-label fw-semibold">{{l.nombre_linea}}</span></label></div>
+    {% endif %}{% endfor %}
+  </div>
+  <label class="form-check mb-2"><input class="form-check-input" type="checkbox" name="usar_habilidades" checked> Tomar habilidades como preferencia</label>
+  <button class="btn btn-primary" onclick="return confirm('Se regenerarán únicamente las líneas seleccionadas. Las demás permanecerán intactas. ¿Continuar?')">Generar líneas seleccionadas</button>
+</form>
+{% endif %}
+
+{% if registros %}
+<div class="rotation-print" id="bloque-impresion-rotacion">
+  <div class="text-center mb-3">
+    <h2 class="h4">ROTACIÓN DE PERSONAL</h2>
+    <div>Fecha: {{fecha}} · Área: {{ 'MFI' if es_mfi else 'Producción' }} · Línea: {{registros[0].nombre_linea}} · Turno: {{ turno }}</div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-bordered align-middle rotation-table text-center">
+      <thead><tr><th class="period-heading">Cada periodo</th>{% for est in estaciones_tabla %}<th class="station-heading">{{est.nombre_estacion}}</th>{% endfor %}</tr></thead>
+      <tbody>
+        {% for r in registros %}
+        <tr><th class="period-heading">{{r.asignaciones[0].hora_inicio if r.asignaciones else periodos[loop.index0][0]}}–{{r.asignaciones[0].hora_fin if r.asignaciones else periodos[loop.index0][1]}}</th>
+          {% for est in estaciones_tabla %}
+          {% set ocupantes = r.asignaciones|selectattr('id_estacion','equalto',est.id_estacion)|list %}
+          <td class="station-cell {% if est.postura == 'De pie' %}station-standing{% else %}station-general{% endif %}">
+            {% for a in ocupantes %}<div class="fw-semibold">{{a.nombre}}</div><small>{{a.numero_empleado}}</small>{% if a.es_prestado %}<span class="badge text-bg-info">Apoyo</span>{% endif %}{% else %}<span class="text-muted">—</span>{% endfor %}
+          </td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="small text-muted">
+    Vista organizada por estación, siguiendo el orden del catálogo operativo. Propuesta para revisión del líder. Las celdas verdes identifican estaciones de pie: en MFI, Breakout y Pulido; en Producción, Pulido y los puestos de Empaque/Brady/Amarre según el nombre configurado. Las celdas lila identifican las demás estaciones. Los préstamos aprobados se muestran en el detalle de asignaciones.
+  </p>
+</div>
+
+{% if operadores_apoyo %}
+<div class="alert alert-warning mt-3">
+  <h3 class="h6 mb-2">Personal presente disponible / apoyo (no asignado a esta línea)</h3>
+  <p class="small mb-2">Estas personas no se insertan automáticamente en las estaciones. La líder puede mantenerlas como apoyo o gestionar un préstamo aprobado a otra línea.</p>
+  <ul class="mb-0">{% for op in operadores_apoyo %}<li>{{op.numero_empleado}} — {{op.nombre}}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+<div class="d-flex flex-wrap gap-2 align-items-center no-print mt-3">
+  <label class="form-label mb-0" for="modo_impresion">Impresión:</label>
+  <select class="form-select" id="modo_impresion" style="max-width:260px" onchange="document.body.dataset.printMode=this.value">
+    <option value="tabla">Solo tabla de rotación</option>
+    <option value="detalles">Tabla y detalles de asignaciones</option>
+  </select>
+  <button class="btn btn-outline-secondary" onclick="window.print()">Imprimir / Guardar PDF</button>
+</div>
+
+{% if session.get('rol') in ['Lider','Supervisor','Administrador'] %}
+<div class="card mt-4 rotation-details">
+  <div class="card-header fw-semibold">Detalle de asignaciones y cambios</div>
+  <div class="table-responsive">
+    <table class="table table-sm table-striped align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Periodo</th>
+          <th>Empleado</th>
+          <th>Estación</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for rr in registros %}
+          {% for a in rr.asignaciones %}
+          <tr>
+            <td>{{a.hora_inicio}}–{{a.hora_fin}}</td>
+            <td>{{a.numero_empleado}} — {{a.nombre}}</td>
+            <td class="station-cell {% if es_mfi and ('breakout' in a.nombre_estacion|lower or 'pulido' in a.nombre_estacion|lower) %}station-standing{% elif not es_mfi and ('pulido' in a.nombre_estacion|lower or 'empaque' in a.nombre_estacion|lower or 'brady' in a.nombre_estacion|lower or 'amarre' in a.nombre_estacion|lower) %}station-standing{% else %}station-general{% endif %}">
+              {{a.nombre_estacion}}
+              {% if a.es_prestado %}<span class="badge text-bg-info">Prestado</span>{% endif %}
+            </td>
+            <td>
+              <div class="d-flex flex-wrap gap-1">
+                <a class="btn btn-sm btn-outline-primary" href="{{url_for('editar_asignacion',id_asignacion=a.id_asignacion)}}">Mover operador</a>
+                <a class="btn btn-sm btn-outline-success" href="{{url_for('intercambio_simultaneo',id_rotacion=rr.id_rotacion)}}">Intercambiar en este periodo</a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{% elif id_linea %}
+<div class="alert alert-info">
+  No hay rotación guardada para esta fecha. Si ya registraste asistencia, autorizaciones y puestos requeridos, puedes generar una propuesta.
+</div>
+{% endif %}
+<div class="d-flex flex-wrap gap-3 align-items-center mt-3 mb-2" aria-label="Leyenda de posturas">
+  <span class="d-inline-flex align-items-center gap-2"><span style="display:inline-block;width:22px;height:22px;border-radius:4px;background:#b9e6c9;border:1px solid #6ea887"></span><strong>De pie</strong></span>
+  <span class="d-inline-flex align-items-center gap-2"><span style="display:inline-block;width:22px;height:22px;border-radius:4px;background:#f1d9ee;border:1px solid #c99ac4"></span><strong>Sentado</strong></span>
+</div>
+<style>
+.rotation-print { overflow-x:auto; border: 1px solid #d8c2df; border-radius: 14px; padding: 1rem; background: #fff; }
+.rotation-print h2 { color: #702963; font-weight: 700; }
+.rotation-table thead th, .rotation-table .station-heading { background: #702963 !important; color: #fff !important; text-align: center; vertical-align: middle; min-width: 105px; } .rotation-table .period-heading { background:#e9e5e9 !important; min-width:120px; }
+.rotation-table tbody td { text-align: center; min-width: 105px; }
+.station-general { background: #f1d9ee !important; color: #44213f !important; }
+.station-standing { background: #b9e6c9 !important; color: #185c36 !important; font-weight: 600; }
+.rotation-table { min-width:700px; }
+.rotation-table td,.rotation-table th { padding:.75rem .6rem; }
+@media(max-width:900px){ .rotation-print { padding:.65rem; } .rotation-table td,.rotation-table th { padding:.65rem .45rem; font-size:.92rem; } }
+@media print {
+  @page { size: landscape; margin: 7mm; }
+  html, body { width:100% !important; height:auto !important; margin:0 !important; padding:0 !important; background:#fff !important; }
+  body { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  body * { visibility:hidden !important; }
+  #bloque-impresion-rotacion, #bloque-impresion-rotacion * { visibility:visible !important; }
+  #bloque-impresion-rotacion { position:static !important; width:100% !important; max-width:100% !important; overflow:visible !important; border:0 !important; padding:0 !important; margin:0 !important; }
+  #bloque-impresion-rotacion .table-responsive { overflow:visible !important; width:100% !important; }
+  #bloque-impresion-rotacion .rotation-table { width:100% !important; min-width:0 !important; table-layout:fixed !important; font-size:7.5pt !important; }
+  #bloque-impresion-rotacion .rotation-table th,
+  #bloque-impresion-rotacion .rotation-table td { min-width:0 !important; width:auto !important; padding:4px 3px !important; overflow-wrap:anywhere !important; }
+  #bloque-impresion-rotacion .rotation-table .period-heading { width:12% !important; }
+  #bloque-impresion-rotacion h2 { font-size:14pt !important; }
+  #bloque-impresion-rotacion .station-standing, #bloque-impresion-rotacion .station-general { print-color-adjust:exact !important; -webkit-print-color-adjust:exact !important; }
+  .no-print, nav, footer, .rotation-details, .alert, .rotation-print p { display:none !important; }
+  body[data-print-mode="detalles"] .rotation-details,
+  body[data-print-mode="detalles"] .rotation-details * { display:revert !important; visibility:visible !important; }
+  body[data-print-mode="detalles"] .rotation-details { position:static !important; width:100% !important; margin-top:8mm !important; }
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const selector=document.getElementById('modo_impresion');
+  if(selector){ document.body.dataset.printMode=selector.value; selector.addEventListener('change',()=>document.body.dataset.printMode=selector.value); }
+});
+</script>
+{% endblock %}

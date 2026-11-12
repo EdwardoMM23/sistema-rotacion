@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block titulo %}Intercambio de estaciones{% endblock %}
+{% block contenido %}
+<h1 class="h3">Intercambio de estaciones</h1>
+<p class="text-muted">Selecciona una línea y un periodo. Se mostrarán los operadores asignados en ese mismo periodo dentro del grupo de líneas correspondiente (por ejemplo, líneas 1 y 2), además de los operadores disponibles.</p>
+
+<form method="get" class="card card-body mb-3">
+    <label class="form-label" for="id_rotacion">Rotación / periodo</label>
+    <select name="id_rotacion" id="id_rotacion" class="form-select mb-3" required>
+        <option value="">Selecciona periodo</option>
+        {% for r in rotaciones %}
+        <option value="{{ r.id_rotacion }}" {% if id_rotacion==r.id_rotacion %}selected{% endif %}>
+            {{ r.fecha }} · {{ r.nombre_linea }} · periodo {{ r.numero_rotacion }} · {{ r.hora_inicio }}
+        </option>
+        {% endfor %}
+    </select>
+    <button class="btn btn-outline-primary" type="submit">Cargar asignaciones</button>
+</form>
+
+{% if id_rotacion and rotacion %}
+<form method="post" class="card card-body" id="form-cambio">
+    <input type="hidden" name="id_rotacion" value="{{ id_rotacion }}">
+
+    <label class="form-label" for="buscar_asignacion_a">1. Operador que deseas cambiar</label>
+    <input class="form-control mb-2" id="buscar_asignacion_a" type="search" placeholder="Buscar por número o nombre">
+    <select name="id_asignacion_a" id="id_asignacion_a" class="form-select mb-3" required>
+        <option value="">Selecciona operador</option>
+        {% for a in asignaciones %}
+        <option value="{{ a.id_asignacion }}">{{ a.numero_empleado }} — {{ a.nombre }} · {{ a.nombre_estacion }} · {{ a.nombre_linea }}</option>
+        {% endfor %}
+    </select>
+
+    <label class="form-label" for="buscar_participante_b">2. Operador con quien intercambiar</label>
+    <input class="form-control mb-2" id="buscar_participante_b" type="search" placeholder="Buscar por número o nombre">
+    <select name="participante_b" id="participante_b" class="form-select mb-3" required>
+        <option value="">Selecciona segundo operador</option>
+        {% if asignaciones %}<optgroup label="Operadores asignados en el grupo (mismo periodo)">
+            {% for a in asignaciones %}
+            <option value="asignacion:{{ a.id_asignacion }}">{{ a.numero_empleado }} — {{ a.nombre }} · {{ a.nombre_estacion }} · {{ a.nombre_linea }}</option>
+            {% endfor %}
+        </optgroup>{% endif %}
+        {% if disponibles %}<optgroup label="Operadores disponibles / sobrantes">
+            {% for o in disponibles %}
+            <option value="disponible:{{ o.id_operador }}">{{ o.numero_empleado }} — {{ o.nombre }} · Disponible de {{ o.linea_origen }}</option>
+            {% endfor %}
+        </optgroup>{% endif %}
+    </select>
+    <div class="alert alert-info py-2">
+        Puedes intercambiar con operadores asignados de cualquiera de las líneas del mismo grupo, sin generar un préstamo. Cada persona conserva su línea y cambia de estación. También puedes seleccionar a un operador disponible o sobrante para ocupar la estación del primero.
+    </div>
+
+    <label class="form-label" for="motivo">Motivo del cambio</label>
+    <textarea class="form-control mb-3" name="motivo" id="motivo" rows="2" required></textarea>
+    <button class="btn btn-primary" type="submit">Validar y aplicar intercambio</button>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const pairs = [
+        ['buscar_asignacion_a', 'id_asignacion_a'],
+        ['buscar_participante_b', 'participante_b']
+    ];
+    pairs.forEach(([inputId, selectId]) => {
+        const input = document.getElementById(inputId);
+        const select = document.getElementById(selectId);
+        if (!input || !select) return;
+        input.addEventListener('input', () => {
+            const query = input.value.trim().toLocaleLowerCase();
+            Array.from(select.options).forEach(option => {
+                if (!option.value) return;
+                option.hidden = query !== '' && !option.textContent.toLocaleLowerCase().includes(query);
+            });
+            if (select.selectedOptions[0]?.hidden) select.value = '';
+        });
+    });
+    const primero = document.getElementById('id_asignacion_a');
+    const segundo = document.getElementById('participante_b');
+    segundo.addEventListener('change', () => {
+        if (primero.value && segundo.value === `asignacion:${primero.value}`) {
+            segundo.value = '';
+            alert('Selecciona un operador diferente al primero.');
+        }
+    });
+});
+</script>
+{% elif id_rotacion %}
+<div class="alert alert-warning">No se encontró un periodo activo. Selecciona otro.</div>
+{% endif %}
+{% endblock %}

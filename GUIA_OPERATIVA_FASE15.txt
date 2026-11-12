@@ -1,0 +1,102 @@
+SISTEMA DE ROTACIONES - FASE 15
+GUÍA UNIFICADA DE CONFIGURACIÓN Y USO
+
+IMPORTANTE
+- Esta versión parte del ZIP cop29 que entregó el usuario.
+- Antes de abrirla, copia la carpeta instance completa a un respaldo externo.
+- No uses datos reales de salud para pruebas. Utiliza operadores ficticios.
+- La propuesta sigue siendo una ayuda de planificación: la líder debe revisarla antes de usarla en planta.
+
+1. INSTALAR / ACTUALIZAR
+1) Extrae el ZIP en una carpeta nueva.
+2) Copia tu carpeta instance original a un lugar seguro. Esta entrega incluye la base de datos del ZIP cop29; si deseas conservar tu información más reciente, reemplaza la carpeta instance del paquete por tu respaldo.
+3) Abre la carpeta en Windows.
+4) Ejecuta CONFIGURAR_PRIMERA_VEZ.bat si es una instalación nueva. Si ya tienes el entorno virtual y sus dependencias, no hace falta recrearlo.
+5) Configura SECRET_KEY como variable de entorno. No compartas esa clave.
+6) Ejecuta INICIAR_DESARROLLO.bat para desarrollo o iniciar_servidor.bat en el equipo autorizado de TI.
+7) En el primer arranque, run_server.py ejecuta crear_base_datos(); la migración agrega MFI1, MFI2, MFI3 y MFI4 sin borrar las líneas existentes.
+
+2. REGISTRAR OPERADORES EN PRODUCCIÓN O MFI
+1) Entra con Supervisor o Administrador.
+2) Abre Operadores > Registrar operador.
+3) Selecciona primero Área: Producción o MFI.
+4) Selecciona la línea filtrada. En MFI aparecerán MFI1, MFI2, MFI3 y MFI4.
+5) Captura número, nombre y turno y guarda.
+6) Registra asistencia para la fecha. Solo las personas marcadas como Presente participan en la propuesta.
+
+3. CONFIGURAR ESTACIONES Y DEMANDA
+1) Abre Puestos por línea.
+2) Selecciona la línea y verifica su área.
+3) Configura qué estaciones se utilizan y cuántas personas requiere cada una.
+4) En Producción configura la misma cantidad total de puestos para los tres periodos del turno. Esta versión conserva el mismo grupo de operadores en los tres periodos; si la demanda cambia entre periodos, el sistema detiene la generación y muestra una explicación en vez de dejar personas entrando y saliendo de la tabla.
+5) En MFI se utilizan dos periodos matutinos: 06:00-10:00 y 10:30-15:12. La demanda puede variar por estación y periodo, incluso quedar en cero. Los horarios vespertinos de MFI no están configurados porque no se han confirmado.
+6) Revisa las posturas de las estaciones. El catálogo MFI incluye Pegamento, Breakout 1, Breakout 2, Inserción 1, Inserción 2, Crimpeo, Horno, Pulido, Int./Visual, IL/Test A, Empaque 1 y Empaque 2.
+
+4. AUTORIZACIONES Y HABILIDADES
+1) Antes de generar, verifica Autorizaciones por operador. Una habilidad alta nunca sustituye una autorización.
+2) Abre Habilidades desde el menú de Líder, Supervisor o Administrador.
+3) Selecciona al operador y registra Baja, Media o Alta para cada estación.
+4) En la pantalla de Rotaciones puedes marcar o desmarcar “Tomar en cuenta las habilidades registradas”.
+5) Las habilidades solo son una preferencia de asignación. Las restricciones médicas, autorizaciones y reglas ergonómicas tienen prioridad.
+
+5. GENERAR ROTACIÓN EN PRODUCCIÓN
+1) Selecciona fecha, turno y línea.
+2) Confirma que asistencia, autorizaciones, restricciones médicas y demanda estén actualizadas.
+3) Pulsa Generar propuesta.
+4) Si hay 12 personas presentes y 11 puestos configurados, se asignan 11 durante los tres periodos y la persona restante aparece en “Personal presente disponible / apoyo”. No aparecerá en una estación en un periodo y en blanco en otro.
+5) La persona de apoyo no se agrega a un puesto extra. Si debe cubrir otra línea, registra un préstamo aprobado en Préstamos. Si permanece disponible, la líder puede mantenerla como apoyo.
+6) Revisa la tabla antes de imprimir o compartirla.
+
+6. MOVER O INTERCAMBIAR OPERADORES
+Mover a otro puesto:
+1) En el detalle de asignaciones, pulsa “Mover operador”.
+2) Selecciona la estación destino y escribe el motivo.
+3) El sistema revisa autorización, restricción vigente, repetición de estación, secuencia ergonómica y dotación requerida.
+4) Si rechaza el movimiento porque la estación actual quedaría descubierta, no es un error: utiliza el intercambio simultáneo.
+
+Intercambiar dos operadores:
+1) En el mismo renglón del periodo, pulsa “Intercambiar en este periodo”.
+2) En “Primera asignación”, selecciona al primer operador.
+3) En “Segunda asignación”, selecciona al segundo operador.
+4) Escribe el motivo y pulsa “Validar y realizar intercambio”.
+5) El sistema valida ambos destinos antes de guardar los dos cambios en una sola transacción. Si una validación falla, no se aplica ninguno.
+6) Si el intercambio se rechaza, revisa el motivo: puede faltar autorización, existir restricción médica, repetirse una estación o romper una regla ergonómica.
+
+Si una persona se retira durante el turno:
+- Registra la salida/ausencia según el proceso de asistencia que utilice la planta.
+- Identifica una persona de apoyo o un préstamo aprobado.
+- No asignes a alguien dos veces en el mismo intervalo.
+- Usa el cambio manual o intercambio para cubrir el puesto y registra el motivo.
+- Si no existe una persona autorizada y compatible, solicita apoyo a supervisión; no fuerces una asignación insegura.
+
+7. PRÉSTAMOS Y PERSONAL DE APOYO
+1) Abre Préstamos.
+2) Selecciona operador, línea de origen, línea destino y fecha.
+3) Registra el intervalo si se conoce y la aprobación correspondiente.
+4) Registra la devolución real cuando regrese; si vuelve antes, marca la devolución anticipada.
+5) La generación consulta préstamos aprobados y vigentes. Revisa el intervalo para evitar doble asignación.
+
+8. RESTRICCIONES MÉDICAS
+- Enfermería/Administrador registra, revalora, amplía o finaliza restricciones y deja evidencia en el historial.
+- Las alertas de vencimiento/revaloración ayudan al seguimiento, pero la decisión de liberar o modificar una restricción corresponde al personal autorizado de Enfermería/Salud Ocupacional.
+- Supervisión y líderes deben consultar solo la información operativa autorizada; no se deben compartir diagnósticos u observaciones clínicas sin autorización expresa de la empresa.
+- Archivar un reporte no debe desactivar una restricción activa.
+
+9. PANTALLA COMPARTIDA E IMPRESIÓN
+- Abre Pantalla de rotaciones en el equipo que se dejará como consulta.
+- La pantalla es de lectura; los cambios se hacen desde una sesión de líder/supervisor.
+- La vista compartida se actualiza automáticamente cuando está habilitada la recarga.
+- Desde Rotaciones usa Imprimir / Guardar PDF. En la ventana de impresión elige “Guardar como PDF”.
+
+10. RESPALDO Y DESPLIEGUE
+- Antes de cada actualización, cierra el sistema y copia instance/rotacion.db a una ubicación de respaldo.
+- Para tabletas no se instala Python ni VS Code: acceden mediante navegador a la dirección interna del servidor autorizado.
+- El equipo servidor debe permanecer encendido y conectado a la red interna; TI debe configurar firewall, acceso, SECRET_KEY, respaldos y arranque automático.
+- No publiques el sistema en internet ni uses datos médicos reales en pruebas.
+
+11. LIMITACIONES CONOCIDAS DE ESTA ENTREGA
+- La selección fija de 11 personas en Producción se prueba automáticamente con datos ficticios; la asignación de apoyo se muestra como disponible, no como una nueva estación.
+- MFI1-MFI4 se crean automáticamente, pero cada línea requiere que el responsable configure estaciones, autorizaciones y demanda real.
+- La demanda MFI por periodo puede cambiar; si la dotación varía, los operadores no asignados en ese periodo deben revisarse como apoyo. No se debe asumir que toda persona de la plantilla MFI estará ocupada en ambos periodos.
+- La sustitución de un operador que se retira se realiza mediante edición/intercambio y préstamo; no hay todavía un botón independiente llamado “Reemplazar por salida de emergencia”.
+- La app y sus plantillas se validaron estáticamente; el entorno de esta sesión no tenía Flask instalado para ejecutar una prueba web completa. Completa la lista de pruebas antes de usarla operativamente.

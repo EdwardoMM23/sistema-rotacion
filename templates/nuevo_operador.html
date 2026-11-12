@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block titulo %}Registrar operador{% endblock %}
+
+{% block contenido %}
+<div class="mb-4">
+    <h1 class="text-primary">Registrar operador</h1>
+    <p class="text-secondary">
+        Completa los datos para dar de alta un nuevo operador en el sistema.
+    </p>
+    <p>
+        <a href="{{ url_for('operadores') }}" class="btn btn-outline-primary">
+            ← Volver a operadores
+        </a>
+    </p>
+</div>
+
+{% with mensajes = get_flashed_messages() %}
+    {% for mensaje in mensajes %}
+        <div class="alert alert-info alert-dismissible fade show shadow-sm">
+            {{ mensaje }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+{% endwith %}
+
+{% if lineas %}
+<form method="POST" class="card card-body shadow-sm">
+    <div class="mb-3">
+        <label for="numero_empleado" class="form-label fw-bold">
+            Número de empleado
+        </label>
+        <input type="text" id="numero_empleado" name="numero_empleado"
+               class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="nombre" class="form-label fw-bold">Nombre completo</label>
+        <input type="text" id="nombre" name="nombre"
+               class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="turno" class="form-label fw-bold">Turno asignado</label>
+        <select id="turno" name="turno" class="form-select" required>
+            <option value="Matutino">Matutino (06:00–15:12)</option>
+            <option value="Vespertino">Vespertino (15:30–00:30)</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="area_operativa" class="form-label fw-bold">Área de trabajo</label>
+        <select id="area_operativa" name="area" class="form-select" required onchange="configurarArea()">
+            <option value="">Selecciona el área</option>
+            <option value="Producción">Producción</option>
+            <option value="MFI">MFI</option>
+        </select>
+    </div>
+    <div class="mb-3" id="contenedor_linea">
+        <label for="id_linea" class="form-label fw-bold">Línea de Producción</label>
+        <select id="id_linea" name="id_linea" class="form-select">
+            <option value="">Selecciona una línea</option>
+            {% for linea in lineas if linea['area'] == 'Producción' %}
+                <option value="{{linea['id_linea']}}">{{linea['nombre_linea']}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="alert alert-info py-2" id="nota_mfi" hidden>El operador quedará registrado en el área MFI. La línea MFI1, MFI2, MFI3 o MFI4 se seleccionará al organizar las rotaciones, no durante el registro.</div>
+
+    <button type="submit" class="btn btn-success w-100">
+        Guardar operador
+    </button>
+</form>
+{% else %}
+<div class="alert alert-warning shadow-sm">
+    No hay líneas activas. Registra una línea primero.
+</div>
+{% endif %}
+<script>function configurarArea(){const area=document.getElementById('area_operativa').value;const caja=document.getElementById('contenedor_linea');const linea=document.getElementById('id_linea');const nota=document.getElementById('nota_mfi');const esMfi=area==='MFI';caja.hidden=esMfi;nota.hidden=!esMfi;linea.required=!esMfi;if(esMfi)linea.value='';}document.addEventListener('DOMContentLoaded',configurarArea);</script>
+{% endblock %}

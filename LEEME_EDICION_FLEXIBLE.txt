@@ -1,0 +1,40 @@
+FASE 13 - EDICION FLEXIBLE, PROPUESTAS ALTERNATIVAS E HISTORIAL
+
+QUE INCLUYE
+- Pantalla de edicion flexible: /rotaciones/edicion
+- Mover un operador a otra estacion mediante la pantalla de edicion individual existente.
+- Intercambio simultaneo mediante /rotaciones/intercambio.
+- Consulta de versiones anteriores e historial: /rotaciones/versiones
+- Accesos desde la pantalla de rotaciones a edicion, versiones e impresion/pantalla compartida.
+- Correccion importante de generacion: primero calcula la propuesta; solo si es valida cancela la version vigente y guarda la nueva en una transaccion. Si el calculo falla, la version vigente permanece activa.
+- La habilidad sigue siendo criterio de preferencia en el generador, nunca sustituye autorizaciones, restricciones medicas ni reglas ergonomicas.
+
+INSTALACION SEGURA
+1. Deten Flask con Ctrl+C.
+2. Haz una copia completa del proyecto y de instance/rotacion.db.
+3. Trabaja primero sobre una copia de pruebas, nunca sobre la carpeta original.
+4. Copia los archivos .py del parche a la raiz del proyecto de pruebas y acepta reemplazar app.py, database.py, generador.py, run_server.py, requirements.txt y algoritmo.py solo si el algoritmo de la version actual coincide con el de tu proyecto. Si tu algoritmo.py tiene cambios propios, conserva tu archivo y compara las funciones antes de reemplazarlo.
+5. Copia los archivos de templates incluidos sobre la carpeta templates. Conserva las demas plantillas de tu proyecto (login, operadores, asistencia, etc.) que no aparecen en el parche.
+6. Activa tu entorno virtual y ejecuta: python -m pip install -r requirements.txt
+7. Ejecuta: python -m py_compile app.py database.py generador.py algoritmo.py run_server.py
+8. Inicia el sistema con el metodo que ya utilizas y prueba con datos ficticios.
+
+PRUEBAS CRITICAS
+- Genera una propuesta valida y verifica que aparecen los periodos y asignaciones.
+- Solicita una nueva propuesta. La version previa debe aparecer como Cancelada en /rotaciones/versiones y conservar sus asignaciones/historial.
+- Fuerza un error de generacion en la copia de pruebas (por ejemplo, desactiva temporalmente la configuracion de puestos) y confirma que la version vigente anterior no se cancela.
+- Cambia un operador a una estacion para la que no esta autorizado: debe rechazarse.
+- Intenta una secuencia ergonomica prohibida: debe rechazarse sin alterar la asignacion.
+- Intercambia dos operadores en el mismo periodo; si una de las dos asignaciones no es valida, ninguna debe guardarse.
+- Abre /rotaciones/versiones y verifica que aparecen versiones, cambios, motivos y responsables.
+- Comprueba la pantalla compartida y la impresion/PDF en computadora y tableta.
+
+LIMITACIONES Y ADVERTENCIAS
+- Este paquete es un parche de codigo, no una instalacion permanente en el servidor de la planta.
+- No se pudo ejecutar una prueba integral de navegador en el entorno de preparacion porque Flask no esta instalado aqui. Se verifico la sintaxis de Python, pero la integracion debe probarse en la copia local.
+- La restauracion de una version anterior como nueva version no se incluye; las versiones se consultan en modo de solo lectura para evitar reactivar asignaciones antiguas sin volver a validarlas.
+- Antes de uso operativo, revisar las reglas con las lideres, Supervisor, Enfermeria y TI. No usar datos medicos o personales reales en pruebas.
+
+
+GUIA COMPLETA
+La guía consolidada de instalación, pantalla compartida, uso desde tabletas/PC y despliegue está en GUIA_UNIFICADA_PANTALLA_COMPARTIDA_Y_DESPLIEGUE.txt.

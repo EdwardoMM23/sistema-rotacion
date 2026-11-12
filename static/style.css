@@ -1,0 +1,48 @@
+/* Variables de color corporativo */
+:root {
+  --bs-primary: #6f42c1; /* Morado corporativo */
+  --bs-body-bg: #9f21da;
+  --bs-body-color: #333333;
+}
+
+/* Fondo y texto */
+body {
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+}
+
+/* Navbar */
+.navbar {
+  background-color: var(--bs-primary) !important;
+}
+
+.navbar-brand {
+  font-weight: bold;
+  color: #6407cf !important;
+}
+
+/* Tarjetas */
+.card {
+  border-radius: 10px;
+}
+
+/* Botones principales */
+.btn-primary {
+  background-color: var(--bs-primary) !important;
+  border-color: var(--bs-primary) !important;
+}
+
+/* Texto y fondos en morado */
+.text-primary {
+  color: var(--bs-primary) !important;
+}
+
+.bg-primary {
+  background-color: var(--bs-primary) !important;
+}
+
+/* Encabezados de tabla en morado */
+.table-primary {
+  --bs-table-bg: var(--bs-primary);
+  --bs-table-color: #af0de0;
+}

@@ -1,0 +1,43 @@
+FASE 10 — SIGUIENTE SUBFASE PROPUESTA: DEMANDA POR PERIODO Y PRÉSTAMOS ENTRE ÁREAS
+
+Esta guía define el siguiente incremento después de probar la Fase 9. No afirma que estas funciones estén ya implementadas en el parche Fase 9.
+
+OBJETIVO
+Permitir que el líder indique la necesidad de personal por estación en cada periodo, priorice una línea/material y gestione apoyos MFI → Producción con aprobación del líder de MFI.
+
+FUNCIONES A IMPLEMENTAR
+1. Demanda por periodo:
+   - Para cada línea, turno, periodo y estación, capturar cantidad requerida.
+   - En MFI permitir, por ejemplo, Breakout 1 = 2 personas y Breakout 2 = 1 en el primer periodo, y cantidades distintas en el segundo.
+   - Las cantidades deben admitir 0; 0 significa que ese puesto no se necesita en ese periodo.
+   - La pantalla debe conservar valores previamente guardados y validar que la demanda no exceda al personal disponible.
+2. Prioridad operativa:
+   - Campo para marcar una línea/material como prioridad alta, media o normal, con motivo y usuario responsable.
+   - La prioridad orienta la asignación de personal, pero nunca puede anular restricciones médicas, autorizaciones ni cobertura mínima acordada.
+3. Préstamos entre áreas:
+   - Solicitud desde Producción para pedir un operador de MFI.
+   - Aprobación o rechazo por líder autorizado de MFI (además de los permisos de Supervisor/Administrador que determine la planta).
+   - Validar disponibilidad, turno, fechas, asistencia, autorizaciones, préstamos simultáneos y cobertura de la línea de origen.
+   - Al aprobar, el operador solo se incorpora a la rotación de destino si el préstamo está vigente para la fecha/turno.
+   - Registrar quién solicitó, quién autorizó, fechas y devolución.
+4. Recomendaciones cuando no hay combinación:
+   - Recalcular con demanda alternativa.
+   - Identificar puestos no cubiertos y estaciones que no tienen personal compatible.
+   - Mostrar operadores potenciales para préstamo sin revelar diagnósticos médicos.
+   - No generar una propuesta si para completarla se tendría que ignorar una restricción obligatoria.
+5. Diseño:
+   - Tablero morado/rosa con estaciones de pie de MFI en verde.
+   - Mostrar área, línea, fecha, turno, líder, estado de revisión y personal prestado.
+   - Mantener versión imprimible parecida a la hoja de planta.
+
+CRITERIOS DE ACEPTACIÓN
+- Una línea puede tener demanda distinta en sus dos periodos.
+- Breakout 1 y Breakout 2 se configuran por separado.
+- Un operador no puede quedar asignado a dos líneas en el mismo periodo.
+- Los préstamos no aprobados, vencidos o fuera de turno no se consideran.
+- Las restricciones médicas y autorizaciones son obligatorias.
+- Si no hay solución, se explica el motivo y se sugieren acciones seguras.
+- Las pruebas se hacen primero con datos ficticios y después con autorización de la planta.
+
+IMPORTANTE
+Antes de activar el módulo de prioridades y préstamo entre áreas en el entorno real, validar con supervisión y con el responsable de seguridad/ergonomía de la planta. No usar diagnósticos médicos en las pantallas de los líderes.

@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block titulo %}Asistencia<style>
+.attendance-choice { display:flex; gap:.5rem; flex-wrap:wrap; }
+.attendance-choice label { flex:1 1 115px; min-height:58px; display:flex; align-items:center; justify-content:center; gap:.5rem; border:2px solid #d6d3d1; border-radius:12px; padding:.75rem; cursor:pointer; font-weight:600; background:#fff; }
+.attendance-choice input { width:1.2rem; height:1.2rem; }
+.attendance-choice label:has(input:checked) { border-color:#702963; background:#f3e8f4; box-shadow:0 0 0 2px #ead6e9; }
+@media(max-width:900px){ .attendance-choice label{min-height:64px;font-size:1rem;} }
+</style>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+ document.querySelectorAll('select[name^="estado_"]').forEach(sel=>{
+   const wrap=document.createElement('div'); wrap.className='attendance-choice mb-3';
+   [...sel.options].forEach((opt,i)=>{
+     const lab=document.createElement('label'); const radio=document.createElement('input');
+     radio.type='radio'; radio.name=sel.name+'_tablet'; radio.value=opt.value; radio.checked=sel.value===opt.value;
+     radio.addEventListener('change',()=>{sel.value=radio.value;});
+     const txt=document.createElement('span'); txt.textContent=(opt.value==='Presente'?'✓ Presente':opt.value==='Ausente'?'✕ Ausente':'○ Pendiente');
+     lab.append(radio,txt); wrap.append(lab);
+   }); sel.style.display='none'; sel.insertAdjacentElement('afterend',wrap);
+ });
+});
+</script>
+{% endblock %}
+
+{% block contenido %}
+<div class="mb-4">
+    <h1 class="text-primary">Confirmación de asistencia</h1>
+    <p class="text-secondary">
+        Los operadores pendientes o ausentes no participan en la generación.
+    </p>
+</div>
+
+<!-- Formulario de selección -->
+<form method="get" class="card card-body shadow-sm mb-4">
+    <label for="fecha" class="form-label fw-bold">Fecha</label>
+    <input type="date" id="fecha" name="fecha"
+           class="form-control mb-3" value="{{ fecha }}" required>
+
+    <label for="turno" class="form-label fw-bold">Turno</label>
+    <select id="turno" name="turno" class="form-select mb-3" required>
+        <option value="Matutino" {% if turno == 'Matutino' %}selected{% endif %}>Matutino</option>
+        <option value="Vespertino" {% if turno == 'Vespertino' %}selected{% endif %}>Vespertino</option>
+    </select>
+    <label for="id_linea" class="form-label fw-bold">Línea</label>
+    <select id="id_linea" name="id_linea"
+            class="form-select mb-3" required>
+        <option value="">Selecciona una línea</option>
+        {% for linea in lineas %}
+        <option value="{{ linea.id_linea }}"
+            {% if id_linea == linea.id_linea %}selected{% endif %}>
+            {{ linea.nombre_linea }}
+        </option>
+        {% endfor %}
+    </select>
+
+    <button class="btn btn-primary w-100" type="submit">
+        Consultar operadores
+    </button>
+</form>
+
+{% if id_linea %}
+    {% if pendientes > 0 %}
+    <div class="alert alert-warning shadow-sm">
+        <strong>Atención:</strong> Hay {{ pendientes }} operador(es) pendiente(s) de confirmar.
+        No se podrán incluir en la rotación.
+    </div>
+    {% endif %}
+
+    <!-- Tabla de operadores -->
+    <div class="card card-body mb-2"><label for="buscar-asistencia" class="form-label fw-bold">Filtrar lista por nombre, apellido o número</label><input id="buscar-asistencia" type="search" class="form-control" placeholder="Escribe para filtrar la lista visible"></div>
+    <form method="post" class="card card-body shadow-sm">
+        <input type="hidden" name="fecha" value="{{ fecha }}">
+        <input type="hidden" name="id_linea" value="{{ id_linea }}">
+        <input type="hidden" name="turno" value="{{ turno }}">
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Número</th>
+                        <th>Operador</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for op in operadores %}
+                    <tr>
+                        <td>{{ op.numero_empleado }}</td>
+                        <td>{{ op.nombre }}</td>
+                        <td>
+                            <select class="form-select"
+                                    name="estado_{{ op.id_operador }}">
+                                {% for estado in ["Pendiente", "Presente", "Ausente"] %}
+                                <option value="{{ estado }}"
+                                    {% if op.estado == estado %}selected{% endif %}>
+                                    {{ estado }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">
+                            No hay operadores registrados en esta línea.
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <button class="btn btn-success w-100 mt-3" type="submit">
+            Guardar asistencia
+        </button>
+    </form>
+{% endif %}
+<style>
+.attendance-choice { display:flex; gap:.5rem; flex-wrap:wrap; }
+.attendance-choice label { flex:1 1 115px; min-height:58px; display:flex; align-items:center; justify-content:center; gap:.5rem; border:2px solid #d6d3d1; border-radius:12px; padding:.75rem; cursor:pointer; font-weight:600; background:#fff; }
+.attendance-choice input { width:1.2rem; height:1.2rem; }
+.attendance-choice label:has(input:checked) { border-color:#702963; background:#f3e8f4; box-shadow:0 0 0 2px #ead6e9; }
+@media(max-width:900px){ .attendance-choice label{min-height:64px;font-size:1rem;} }
+</style>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+ document.querySelectorAll('select[name^="estado_"]').forEach(sel=>{
+   const wrap=document.createElement('div'); wrap.className='attendance-choice mb-3';
+   [...sel.options].forEach((opt,i)=>{
+     const lab=document.createElement('label'); const radio=document.createElement('input');
+     radio.type='radio'; radio.name=sel.name+'_tablet'; radio.value=opt.value; radio.checked=sel.value===opt.value;
+     radio.addEventListener('change',()=>{sel.value=radio.value;});
+     const txt=document.createElement('span'); txt.textContent=(opt.value==='Presente'?'✓ Presente':opt.value==='Ausente'?'✕ Ausente':'○ Pendiente');
+     lab.append(radio,txt); wrap.append(lab);
+   }); sel.style.display='none'; sel.insertAdjacentElement('afterend',wrap);
+ });
+});
+</script>
+{% endblock %}
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+ const input = document.getElementById('buscar-asistencia');
+ if (!input) return;
+ input.addEventListener('input', function () {
+  const q = input.value.toLocaleLowerCase();
+  document.querySelectorAll('table tbody tr').forEach(function (row) {
+   row.hidden = !row.innerText.toLocaleLowerCase().includes(q);
+  });
+ });
+});
+</script>
+

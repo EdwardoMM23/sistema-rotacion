@@ -1,0 +1,66 @@
+FASE 4 - CORRECCIÓN DE FUNCIONES, VALIDACIÓN E HISTORIAL
+
+QUÉ CORRIGE ESTA ACTUALIZACIÓN
+1. La pantalla de rotaciones recibe las asignaciones que necesita mostrar.
+2. El enlace Cambiar estación ya tiene una ruta Flask que procesa la solicitud.
+3. Antes de guardar un cambio, se comprueba la autorización, restricciones vigentes,
+   secuencia con el periodo anterior/siguiente y cobertura configurada de estaciones.
+4. Las propuestas generadas registran el usuario que las creó y un evento de historial.
+5. La pantalla Historial recibe los datos y filtros que realmente espera su plantilla.
+6. La pantalla Cuentas de usuario permite crear cuentas y activar/desactivar cuentas.
+   Las contraseñas se guardan con hash; no se almacenan como texto plano.
+7. No se permite desactivar la propia cuenta ni al último administrador activo.
+8. Se alinean las rutas de restricciones con el rol único Enfermeria.
+9. El servidor ya no activa el modo debug por defecto. Para desarrollo local se puede
+   habilitar temporalmente con FLASK_DEBUG=1, pero no debe usarse en producción.
+10. Se corrige la normalización de nombres con acentos; por ejemplo, Inserción se reconoce
+    como alias de Crimpeo.
+
+INSTALACIÓN
+1. Detén Flask con Ctrl+C.
+2. Haz copia de seguridad de TODA la carpeta del proyecto y otra copia de
+   instance/rotacion.db.
+3. Descomprime este paquete.
+4. Copia app.py y algoritmo.py sobre los archivos homónimos de tu proyecto.
+   Copia también verificar_fase4.py a la raíz del proyecto.
+5. No reemplaces ni elimines instance/rotacion.db, venv, templates ni otros archivos.
+6. Activa tu entorno virtual como acostumbras.
+7. Ejecuta las verificaciones indicadas abajo.
+
+PRUEBAS EN TERMINAL
+Ejecuta en la raíz del proyecto:
+  python -m py_compile app.py algoritmo.py database.py generador.py
+  python probar_reglas.py
+  python verificar_fase4.py
+
+PRUEBAS MANUALES EN EL NAVEGADOR
+1. Ejecuta python app.py e inicia sesión con una cuenta de prueba.
+2. En Rotaciones, consulta una fecha y línea que ya tenga una propuesta guardada.
+   Debe aparecer la tabla con las estaciones por operador.
+3. En el detalle, abre Cambiar estación.
+4. Prueba una estación para la que el operador NO esté autorizado: debe rechazarse.
+5. Prueba una estación bloqueada por una restricción vigente: debe rechazarse.
+6. Prueba un cambio que infrinja Horno->Pulido, IL->Visual, Visual->IL o dos estaciones
+   de pie consecutivas: debe rechazarse.
+7. Si un cambio deja la estación de origen por debajo de la cantidad requerida, debe
+   rechazarse. En esta versión los intercambios simultáneos de dos operadores aún no
+   están implementados; se debe conservar la asignación original si se requiere un intercambio.
+8. Prueba un cambio válido, si existe una plaza libre en la estación destino y la estación
+   de origen conserva su cobertura. Debe guardarse y aparecer en Historial.
+9. En Cuentas de usuario, crea una cuenta ficticia con contraseña de 10 o más caracteres,
+   confirma que aparece en la lista y prueba iniciar sesión con su rol.
+10. Desactiva una cuenta ficticia y confirma que ya no puede iniciar sesión. No desactives
+    tu cuenta actual ni el último administrador.
+11. Abre Historial, selecciona fecha y línea y confirma que aparecen eventos de generación
+    y de cambios manuales.
+12. Confirma que las restricciones y el reporte operativo siguen funcionando.
+
+LIMITACIONES CONOCIDAS
+- El cambio individual de estación se bloquea si rompe la cobertura; todavía no existe
+  una pantalla para intercambiar simultáneamente dos operadores.
+- No se han probado todas las rutas en un servidor Flask real desde este entorno. Las
+  comprobaciones de sintaxis y reglas sí se ejecutaron; las pruebas de navegador deben
+  realizarse en tu computadora.
+- No es un sistema listo para producción real. Antes de conectarlo a una red de planta,
+  la empresa debe revisar seguridad, respaldos, permisos, sesiones y tratamiento de datos.
+- Para pruebas utiliza operadores ficticios y nunca datos clínicos reales.

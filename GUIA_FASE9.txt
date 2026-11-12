@@ -1,0 +1,57 @@
+FASE 9 — VARIEDAD DE ROTACIONES, PRÉSTAMOS, ÁREA MFI Y DISEÑO VISUAL
+
+Esta actualización es un PARCHE para el proyecto existente. No contiene la base de datos de la planta ni el entorno virtual.
+
+QUÉ CAMBIA
+1. El generador intenta variar estaciones frente al día anterior y penaliza fuertemente repetir la misma estación en el mismo horario.
+2. Las restricciones médicas activas y las autorizaciones siguen siendo condiciones obligatorias. Si no encuentra combinación, devuelve mensajes y alternativas; no omite restricciones.
+3. Los préstamos aprobados y vigentes se consultan al generar la rotación de la línea de destino. La asignación queda marcada como prestada en la base de datos y en el detalle.
+4. Evita usar en la línea de origen a un operador que tenga un préstamo aprobado vigente hacia otra línea.
+5. Añade el campo Área de línea: Producción o MFI. Se configura en “Configurar puestos”.
+6. MFI usa dos periodos matutinos: 06:00–10:00 y 10:30–15:12. Producción conserva sus tres periodos. Los horarios vespertinos de MFI se configuraron como 15:30–19:30 y 20:00–00:30 como propuesta editable; confirmar con supervisión antes de usarlos.
+7. Añade estaciones MFI separadas: Breakout 1/2, Inserción 1/2 y Empaque 1/2.
+8. Para MFI, Horno se trata como sentado; Breakout 1/2 y Pulido como de pie; las demás estaciones MFI incluidas en el catálogo se tratan como sentadas. Producción conserva sus reglas propias.
+9. Mejora la tabla de rotaciones con cabecera morada, horarios dinámicos y verde para Breakout/Pulido únicamente en MFI.
+10. En Configurar puestos, las cantidades se definen por línea. Puedes poner Breakout 1 = 2 y Breakout 2 = 1, o dejar un puesto en 0 si no se requiere en esa línea.
+
+IMPORTANTE SOBRE LA DEMANDA MFI
+La cantidad configurada para cada estación es por línea y se aplica a los dos periodos de ese turno. Esta fase permite diferencias entre líneas, pero todavía no configura cantidades distintas entre el primer y segundo periodo de una misma línea. Si la carga de trabajo cambia entre periodos, la siguiente subfase debe agregar demanda por periodo.
+
+INSTALACIÓN SEGURA
+1. Detén Flask con Ctrl+C.
+2. Haz una copia de la carpeta del proyecto y, por separado, de instance/rotacion.db.
+3. Extrae este ZIP en una carpeta temporal.
+4. Copia los archivos conservando las carpetas y reemplaza los archivos existentes:
+   app.py, database.py, generador.py, algoritmo.py,
+   templates/rotaciones.html y templates/configuracion_puestos.html.
+5. Copia verificar_fase9.py a la raíz.
+6. NO reemplaces ni borres instance/rotacion.db. La aplicación realiza migraciones aditivas al iniciar.
+7. Activa tu entorno virtual y ejecuta:
+   python -m py_compile app.py database.py algoritmo.py generador.py
+   python verificar_fase8.py
+   python verificar_fase9.py
+8. Ejecuta python app.py y entra al sistema.
+
+CONFIGURACIÓN INICIAL
+A. Abre Configurar puestos.
+B. Selecciona una línea y elige su área: Producción o MFI.
+C. En una línea MFI configura cantidades requeridas de Breakout 1, Breakout 2, Pulido, etc. Pon 0 en puestos no requeridos. Guarda.
+D. Verifica que el personal de esa línea tenga el turno correcto, asistencia Presente y autorizaciones para sus estaciones.
+E. Para un préstamo, registra la solicitud, apruébala desde el módulo de préstamos y luego genera la rotación de la línea de destino para la fecha y turno correspondientes. Debe aparecer como “Prestado” en el detalle.
+F. Las rotaciones ya guardadas no se recalculan automáticamente. Para probar un cambio, usa una fecha nueva o sigue el proceso autorizado de cancelar/volver a generar según las reglas de la planta.
+
+PRUEBAS MANUALES OBLIGATORIAS
+1. Generar Producción y confirmar tres periodos.
+2. Marcar una línea como MFI y confirmar dos periodos matutinos.
+3. Configurar Breakout 1 con 2 personas y Breakout 2 con 1 en una línea; configurar otra línea con cantidades diferentes.
+4. Crear una restricción activa que bloquee una estación y comprobar que el operador nunca sea asignado allí.
+5. Aprobar un préstamo vigente a la línea de destino, confirmar asistencia y autorizaciones del operador, y generar la rotación de destino.
+6. Confirmar que el mismo operador no quede en rotaciones de dos líneas el mismo turno.
+7. Comparar dos días seguidos: el sistema debe preferir otra estación y cambiar horarios cuando pueda. Si la cantidad de puestos, las autorizaciones o las restricciones dejan una única combinación, puede repetirse; en ese caso revisa los avisos.
+8. Revisar visualmente las rotaciones e imprimir una prueba.
+
+ALCANCE Y SEGURIDAD
+- Este parche no sustituye la validación de líderes/supervisión ni autoriza uso operativo automático.
+- El sistema no debe revelar diagnósticos médicos a líderes.
+- La verificación automática comprueba sintaxis, esquema y horarios; las pruebas de préstamos/restricciones deben hacerse en el navegador con datos de prueba.
+- No hemos confirmado desde aquí la ejecución completa en el equipo de la planta; la base de datos real y sus datos deben conservarse y probarse localmente.

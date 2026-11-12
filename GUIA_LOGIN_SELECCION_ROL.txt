@@ -1,0 +1,42 @@
+ACTUALIZACION: INICIO DE SESION CON SELECCION DE ROL
+
+ARCHIVOS INCLUIDOS
+- app.py: valida en el servidor que el rol seleccionado corresponda al rol guardado en la cuenta.
+- templates/login.html: pantalla con selector de tipo de usuario, usuario y contraseña.
+- crear_usuario.py: crea cuentas nuevas con los cuatro roles actuales.
+
+ANTES DE COPIAR
+1. Detén Flask con Ctrl+C.
+2. Haz una copia de seguridad de toda la carpeta del proyecto y de instance/rotacion.db.
+3. Descomprime este ZIP.
+4. Copia los archivos respetando las carpetas. Reemplaza app.py, templates/login.html y crear_usuario.py.
+5. NO reemplaces instance/rotacion.db ni la carpeta venv.
+
+INICIAR
+Desde la carpeta del proyecto ejecuta:
+    python app.py
+Abre la dirección local que indique Flask, normalmente http://127.0.0.1:5000/login.
+
+COMO FUNCIONA
+1. La persona selecciona Administrador, Líder de producción, Supervisor o Enfermería.
+2. Escribe el nombre de usuario y contraseña de su cuenta.
+3. Flask busca la cuenta activa y verifica la contraseña.
+4. Flask compara el rol seleccionado con el rol real guardado en la base de datos.
+5. Solo si coinciden se crea la sesión; los privilegios existentes siguen controlándose con requiere_rol en app.py.
+
+IMPORTANTE
+- Seleccionar un rol no concede privilegios. El servidor comprueba el rol real de la cuenta.
+- Las cuentas antiguas con rol Doctor se reconocen como Enfermería al iniciar sesión, sin modificar ni borrar la base de datos.
+- Las cuentas nuevas deben crearse con uno de estos valores exactos: Lider, Supervisor, Enfermeria, Administrador.
+- Para crear una cuenta nueva, ejecuta: python crear_usuario.py
+- Si una cuenta está desactivada, no podrá iniciar sesión.
+- Este paquete no incluye base de datos, contraseñas ni entorno virtual.
+
+PRUEBAS RECOMENDADAS
+1. Entrar con una cuenta Líder seleccionando Líder.
+2. Probar esa misma cuenta seleccionando Supervisor: debe rechazar el acceso.
+3. Escribir una contraseña incorrecta: debe rechazar el acceso.
+4. Entrar con cuentas de los otros roles seleccionando el rol correcto.
+5. Confirmar que cada cuenta conserva sus permisos previos.
+
+La sintaxis de app.py y crear_usuario.py fue comprobada con py_compile. No se pudo ejecutar una prueba integral de Flask en este entorno porque Flask no está instalado aquí; realiza las pruebas anteriores en tu equipo.
